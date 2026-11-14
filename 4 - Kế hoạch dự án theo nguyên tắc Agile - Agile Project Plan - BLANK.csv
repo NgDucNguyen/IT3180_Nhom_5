@@ -1,0 +1,34 @@
+﻿,AGILE PROJECT PLAN TEMPLATE,,,,,,,,,,,
+,,,,PROJECT NAME,PROJECT MANAGER,START DATE,END DATE,,OVERALL PROGRESS,,PROJECT DELIVERABLE,"Website C2C mua bán/trao đổi thiết bị điện tử; mã nguồn, CSDL, SRS, sơ đồ thiết kế, test case và báo cáo kiểm thử."
+,,,,Electronics Trading & Exchange Marketplace,Nhóm 5,27/10/2026,,,0%,,SCOPE STATEMENT,"Phạm vi: tài khoản/xác thực, tin đăng, danh mục, tìm kiếm/lọc, yêu cầu mua, đề nghị trao đổi, trạng thái giao dịch, quản trị/kiểm duyệt. Không triển khai thanh toán trực tuyến hoặc tích hợp vận chuyển thật."
+,,,,,,,,,,,,
+,AT RISK,Level,Task ID (WBS),TASK NAME,FEATURE TYPE,RESPONSIBLE,STORY POINTS,START,FINISH,DURATION (DAYS),STATUS,COMMENTS
+,,1,1,Sprint 1 – Nền tảng & bản demo cốt lõi,Sprint,Cả nhóm,,27/10/2026,09/11/2026,13,In Progress,"Mục tiêu: chốt yêu cầu, thiết kế nền tảng và demo luồng đăng nhập + tin đăng cơ bản."
+,,2,1.1,Phân tích yêu cầu và xác định MVP,Analysis,Gia Khanh Pham (PM/BA) + Cả nhóm,5,27/10/2026,28/10/2026,1,In Progress,"Chốt in-scope/out-of-scope; ưu tiên luồng mua bán trước, trao đổi ở sprint sau."
+,,2,1.2,Viết user story và tiêu chí chấp nhận,Analysis,Gia Khanh Pham (PM/BA),3,27/10/2026,29/10/2026,2,Not Started,"Story cho đăng ký/đăng nhập, xem danh sách, tạo tin đăng; mỗi story có acceptance criteria."
+,Yes,2,1.3,Phân tích workflow và quy tắc trạng thái,Analysis,Nguyễn Đăng Minh (SA/QA) + Đỗ Thái Dương,3,28/10/2026,30/10/2026,2,Not Started,"Mô tả trạng thái Listing, PurchaseRequest, ExchangeOffer, Transaction và điều kiện chuyển trạng thái. [GATE G1]"
+,,2,1.4,Thiết kế kiến trúc và mô hình dữ liệu,Design,Đỗ Thái Dương (Architect) + Nguyễn Đức Nguyên,5,29/10/2026,01/11/2026,3,Not Started,"ERD sơ bộ cho User, Listing, Category, Brand, PurchaseRequest, ExchangeOffer, Transaction, Report. [GATE G1]"
+,,2,1.5,Thiết kế wireframe các màn hình cốt lõi,Design,Vũ Tâm (UI/UX + FE),3,29/10/2026,01/11/2026,3,Not Started,"Wireframe 4 màn hình + quy ước design token (màu, typography, spacing, component) dùng chung với shadcn/ui."
+,,2,1.6,Thiết lập repository và môi trường phát triển local,Development,Nguyễn Đức Nguyên (Platform + DB),2,30/10/2026,02/11/2026,3,Not Started,"Repo local + docker-compose chỉ cho PostgreSQL + Makefile (dev, db:up, reset-db, seed, check) + AGENTS.md + pre-commit hook + README chạy trên máy trắng. Không dựng CI/CD và không deploy vì chỉ chạy local."
+,,2,1.7,Tạo schema CSDL và dữ liệu mẫu,Development,Nguyễn Đức Nguyên (Schema) + Vu Anh Duck (Seed),5,01/11/2026,04/11/2026,3,Not Started,"Bảng nền tảng, khóa ngoại, partial unique index chống double-booking; seed 5 danh mục, 8 brand, 3 user, 20-30 tin đăng."
+,,2,1.8,"Xây dựng đăng ký, đăng nhập và phân quyền cơ bản",Development,Nguyễn Minh Việt (BE) + Phi Hoàng (FE),8,02/11/2026,06/11/2026,4,Not Started,"JWT trong httpOnly cookie (Secure=false vì localhost); Vite proxy /api để tránh lỗi CORS/credentials; guard USER/ADMIN; không lưu mật khẩu dạng rõ."
+,,2,1.9,Xây dựng tạo và xem tin đăng cơ bản,Development,Vu Anh Duck (BE) + Vũ Tâm (FE),8,03/11/2026,07/11/2026,4,Not Started,"Tạo tin đăng với tên, mô tả, giá, tình trạng, danh mục; danh sách có phân trang; kiểm tra quyền sở hữu khi sửa/ẩn tin."
+,Yes,2,1.10,Kiểm thử luồng cốt lõi và chuẩn bị demo Sprint 1,Testing,Nguyễn Đăng Minh (QA) + Cả nhóm,3,07/11/2026,09/11/2026,2,Not Started,"Test case cơ bản cho 3 luồng; cập nhật backlog; kịch bản demo + video demo dự phòng (rủi ro máy demo local)."
+,,2,1.11,Khung ứng dụng frontend dùng chung,Development,Phi Hoàng (Shell) + Nguyễn Minh Việt (Api client/MSW),3,30/10/2026,02/11/2026,3,Not Started,"Routing, layout, header, shadcn/ui, api client có credentials, MSW mock, xử lý loading/error dùng chung; tránh 2 người tự dựng trùng. [MỚI]"
+,,1,2,Sprint 2 – Tìm kiếm & quy trình mua hàng,Sprint,Cả nhóm,,10/11/2026,23/11/2026,13,Not Started,Mục tiêu: người mua tìm được sản phẩm và gửi yêu cầu mua; người bán xử lý yêu cầu.
+,,2,2.1,Hoàn thiện trang chi tiết tin đăng,Development,Frontend + Backend,5,10/11/2026,12/11/2026,2,Not Started,"Hiển thị thông tin thiết bị, giá, tình trạng, người bán và phương thức giao dịch."
+,,2,2.2,Xây dựng tìm kiếm và lọc tin đăng,Development,Backend + Frontend,8,11/11/2026,15/11/2026,4,Not Started,"Tìm theo từ khóa; lọc danh mục, thương hiệu, tình trạng và khoảng giá nếu khả thi."
+,,2,2.3,Quản lý tin đăng của người bán,Development,Frontend + Backend,5,12/11/2026,16/11/2026,4,Not Started,"Xem tin của tôi, chỉnh sửa, ẩn tin; kiểm tra quyền sở hữu tin đăng."
+,Yes,2,2.4,Gửi và theo dõi yêu cầu mua hàng,Development,Backend + Frontend,8,14/11/2026,18/11/2026,4,Not Started,Người mua gửi yêu cầu và xem trạng thái; chặn yêu cầu trùng hoặc không hợp lệ.
+,Yes,2,2.5,Người bán chấp nhận/từ chối yêu cầu mua,Development,Backend + Frontend,8,16/11/2026,20/11/2026,4,Not Started,Kiểm soát trạng thái yêu cầu; tránh xác nhận nhiều giao dịch cho cùng tin đăng.
+,Yes,2,2.6,Kiểm thử trạng thái giao dịch mua bán,Testing,Backend + QA,5,18/11/2026,22/11/2026,4,Not Started,"Kiểm thử chấp nhận, từ chối, hủy và hoàn tất; xác định rõ bên nào xác nhận."
+,,2,2.7,Sprint Review/Retrospective và cập nhật backlog,Analysis,Cả nhóm,2,23/11/2026,23/11/2026,0,Not Started,"Tổng kết demo, lỗi còn lại, bài học và ưu tiên sprint kế tiếp."
+,,1,3,Sprint 3 – Trao đổi sản phẩm,Sprint,Cả nhóm,,,,,Not Started,Đầu mục lớn; lịch sẽ được tinh chỉnh sau Sprint 2.
+,Yes,2,3.1,"Gửi, chấp nhận/từ chối đề nghị trao đổi",Development,Frontend + Backend,,,,,Not Started,Cho phép chọn sản phẩm của mình; không cho tự trao đổi; chỉ dùng tin còn khả dụng.
+,Yes,2,3.2,Xác nhận hoàn thành và khóa trạng thái hai tin,Development,Backend + QA,,,,,Not Started,Chặn sản phẩm tham gia hai giao dịch đã xác nhận đồng thời; kiểm thử các trường hợp ngoại lệ.
+,,1,4,Sprint 4 – Quản trị và kiểm duyệt,Sprint,Cả nhóm,,,,,Not Started,Đầu mục lớn; lịch và chi tiết được tinh chỉnh theo kết quả Sprint 3.
+,,2,4.1,"Quản lý tài khoản, danh mục và thương hiệu",Development,Frontend + Backend,,,,,Not Started,"Chức năng quản trị tài khoản, Category và Brand."
+,,2,4.2,Kiểm duyệt tin đăng và xử lý báo cáo vi phạm,Development,Frontend + Backend,,,,,Not Started,"Admin xem, duyệt/ẩn tin và xử lý Report."
+,,1,5,"Sprint 5 – Tích hợp, kiểm thử và hoàn thiện",Sprint,Cả nhóm,,,,,Not Started,Đầu mục lớn; thời gian dự kiến cần xác nhận theo lịch môn học.
+,Yes,2,5.1,"Kiểm thử tích hợp, phân quyền và quy tắc nghiệp vụ",Testing,QA + Cả nhóm,,,,,Not Started,"Bộ test case cho mua bán, trao đổi, quản trị và các tình huống lỗi."
+,,2,5.2,"Sửa lỗi, hoàn thiện tài liệu và kịch bản demo",Documentation,Cả nhóm,,,,,Not Started,"Hoàn thiện SRS, sơ đồ, hướng dẫn chạy, báo cáo kiểm thử và demo cuối kỳ."

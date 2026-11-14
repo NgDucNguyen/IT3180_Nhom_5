@@ -1,0 +1,249 @@
+// ============================================================================
+// PRISMA SCHEMA - Electronics Trading & Exchange Marketplace
+// Nhóm 5 - IT3180
+// CHỦ SỞ HỮU DUY NHẤT: TV2 (System / DB Architect)
+// KHÔNG AI KHÁC ĐƯỢC SỬA FILE NÀY. Muốn đổi schema -> mở issue cho TV2.
+// ============================================================================
+//
+// LƯU Ý QUAN TRỌNG VỀ ENUM:
+// SQLite (thông qua Prisma) KHÔNG hỗ trợ `enum`. Vì vậy mọi cột trạng thái được
+// khai báo là String, và danh sách giá trị hợp lệ được định nghĩa DUY NHẤT tại
+//   src/lib/constants.ts
+// Tuyệt đối không hardcode chuỗi trạng thái rải rác trong code. Luôn import:
+//   import { LISTING_STATUS, type ListingStatus } from "@/lib/constants";
+//
+// ĐƠN VỊ TIỀN: VND, kiểu Int (không dùng Float để tránh sai số).
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// 1. USER
+// role   : USER | ADMIN
+// status : ACTIVE | LOCKED
+// ---------------------------------------------------------------------------
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  phone        String?
+  avatarUrl    String?
+  role         String   @default("USER")
+  status       String   @default("ACTIVE")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  listings         Listing[]
+  purchaseRequests PurchaseRequest[]
+  offersProposed   ExchangeOffer[]   @relation("OfferProposer")
+  offersReceived   ExchangeOffer[]   @relation("OfferReceiver")
+  dealsAsBuyer     Transaction[]     @relation("DealBuyer")
+  dealsAsSeller    Transaction[]     @relation("DealSeller")
+  reports          Report[]
+
+  @@index([role])
+  @@index([status])
+  @@map("users")
+}
+
+// ---------------------------------------------------------------------------
+// 2. CATEGORY  (danh mục thiết bị)
+// ---------------------------------------------------------------------------
+model Category {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String?
+  icon        String?
+
+  listings Listing[]
+
+  @@map("categories")
+}
+
+// ---------------------------------------------------------------------------
+// 3. BRAND  (thương hiệu)
+// ---------------------------------------------------------------------------
+model Brand {
+  id      String  @id @default(cuid())
+  name    String
+  slug    String  @unique
+  logoUrl String?
+
+  listings Listing[]
+
+  @@map("brands")
+}
+
+// ---------------------------------------------------------------------------
+// 4. LISTING  (tin đăng)
+// condition : NEW | LIKE_NEW | GOOD | FAIR
+// status    : PENDING | ACTIVE | IN_TRANSACTION | SOLD | EXCHANGED | REJECTED | HIDDEN
+// specsJson / imagesJson : chuỗi JSON (SQLite không có kiểu Json)
+//   specsJson  ví dụ: {"screen":"6.1 inch","storage":"256GB"}
+//   imagesJson ví dụ: ["/images/iphone15.svg"]
+// brandId nullable: cho phép linh kiện/phụ kiện không có thương hiệu.
+// ---------------------------------------------------------------------------
+model Listing {
+  id                 String   @id @default(cuid())
+  sellerId           String
+  categoryId         String
+  brandId            String?
+  title              String
+  description        String
+  price              Int
+  condition          String   @default("GOOD")
+  specsJson          String?
+  imagesJson         String?
+  allowExchange      Boolean  @default(false)
+  exchangePreference String?
+  status             String   @default("PENDING")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  seller   User     @relation(fields: [sellerId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+  brand    Brand?   @relation(fields: [brandId], references: [id])
+
+  purchaseRequests       PurchaseRequest[]
+  offersAsTarget         ExchangeOffer[]   @relation("OfferTargetListing")
+  offersAsOffered        ExchangeOffer[]   @relation("OfferOfferedListing")
+  dealsAsPrimary         Transaction[]     @relation("DealPrimaryListing")
+  dealsAsSecondary       Transaction[]     @relation("DealSecondaryListing")
+  reports                Report[]
+
+  @@index([sellerId])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([status, createdAt])
+  @@map("listings")
+}
+
+// ---------------------------------------------------------------------------
+// 5. PURCHASE REQUEST  (yêu cầu mua)
+// status : PENDING | ACCEPTED | REJECTED | CANCELLED
+// offeredPrice: giá người mua trả (VND). Bằng 0 nghĩa là "đồng ý giá niêm yết".
+// ---------------------------------------------------------------------------
+model PurchaseRequest {
+  id           String   @id @default(cuid())
+  listingId    String
+  buyerId      String
+  offeredPrice Int
+  message      String?
+  status       String   @default("PENDING")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  listing Listing @relation(fields: [listingId], references: [id])
+  buyer   User    @relation(fields: [buyerId], references: [id])
+
+  transaction Transaction?
+
+  @@index([listingId, status])
+  @@index([buyerId])
+  @@map("purchase_requests")
+}
+
+// ---------------------------------------------------------------------------
+// 6. EXCHANGE OFFER  (đề nghị trao đổi)
+// targetListingId  : thiết bị X mà người đề nghị MUỐN LẤY
+// offeredListingId : thiết bị Y của người đề nghị ĐEM ĐI ĐỔI
+// cashTopUp        : tiền bù thêm (VND), 0 nếu trao đổi ngang
+// status           : PENDING | ACCEPTED | REJECTED | CANCELLED
+// Ràng buộc nghiệp vụ: proposerId != receiverId (validate ở service, SQLite không
+// hỗ trợ CHECK constraint qua Prisma).
+// ---------------------------------------------------------------------------
+model ExchangeOffer {
+  id               String   @id @default(cuid())
+  targetListingId  String
+  offeredListingId String
+  proposerId       String
+  receiverId       String
+  cashTopUp        Int      @default(0)
+  message          String?
+  status           String   @default("PENDING")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  targetListing  Listing @relation("OfferTargetListing", fields: [targetListingId], references: [id])
+  offeredListing Listing @relation("OfferOfferedListing", fields: [offeredListingId], references: [id])
+  proposer       User    @relation("OfferProposer", fields: [proposerId], references: [id])
+  receiver       User    @relation("OfferReceiver", fields: [receiverId], references: [id])
+
+  transaction Transaction?
+
+  @@index([targetListingId, status])
+  @@index([offeredListingId, status])
+  @@index([proposerId])
+  @@index([receiverId])
+  @@map("exchange_offers")
+}
+
+// ---------------------------------------------------------------------------
+// 7. TRANSACTION  (giao dịch đã phát sinh)
+// type   : PURCHASE | EXCHANGE
+// status : IN_PROGRESS | COMPLETED | CANCELLED
+// secondaryListingId : chỉ dùng khi type = EXCHANGE (thiết bị thứ 2 của giao dịch)
+// purchaseRequestId / exchangeOfferId: nguồn phát sinh giao dịch (nullable)
+// Mỗi purchaseRequest / exchangeOffer chỉ sinh ra tối đa 1 transaction (@unique).
+// ---------------------------------------------------------------------------
+model Transaction {
+  id                 String    @id @default(cuid())
+  type               String
+  listingId          String
+  secondaryListingId String?
+  buyerId            String
+  sellerId           String
+  purchaseRequestId  String?   @unique
+  exchangeOfferId    String?   @unique
+  buyerConfirmed     Boolean   @default(false)
+  sellerConfirmed    Boolean   @default(false)
+  status             String    @default("IN_PROGRESS")
+  completedAt        DateTime?
+  createdAt          DateTime  @default(now())
+
+  listing          Listing          @relation("DealPrimaryListing", fields: [listingId], references: [id])
+  secondaryListing Listing?         @relation("DealSecondaryListing", fields: [secondaryListingId], references: [id])
+  buyer            User             @relation("DealBuyer", fields: [buyerId], references: [id])
+  seller           User             @relation("DealSeller", fields: [sellerId], references: [id])
+  purchaseRequest  PurchaseRequest? @relation(fields: [purchaseRequestId], references: [id])
+  exchangeOffer    ExchangeOffer?   @relation(fields: [exchangeOfferId], references: [id])
+
+  @@index([status])
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([listingId])
+  @@map("transactions")
+}
+
+// ---------------------------------------------------------------------------
+// 8. REPORT  (báo cáo vi phạm)
+// status : PENDING | RESOLVED | DISMISSED
+// reason : mô tả ngắn lý do (ví dụ: "Hàng giả", "Lừa đảo", "Sai danh mục")
+// ---------------------------------------------------------------------------
+model Report {
+  id          String   @id @default(cuid())
+  reporterId  String
+  listingId   String
+  reason      String
+  description String?
+  status      String   @default("PENDING")
+  adminNote   String?
+  createdAt   DateTime @default(now())
+
+  reporter User    @relation(fields: [reporterId], references: [id])
+  listing  Listing @relation(fields: [listingId], references: [id])
+
+  @@index([status])
+  @@index([listingId])
+  @@index([reporterId])
+  @@map("reports")
+}
