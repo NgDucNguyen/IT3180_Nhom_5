@@ -1,33 +1,48 @@
 @import "tailwindcss";
 
 /* ============================================================================
- * Design tokens dùng chung - TV4 (UI/UX Lead) sẽ mở rộng file này.
- * Chỉ TV4 và TV2 được sửa. Người khác muốn đổi màu -> báo TV4.
+ * DESIGN SYSTEM TOKENS — ElectroSwap C2C (IT3180 · Nhóm 5)
+ * Chủ sở hữu: TV4 (UI/UX Lead)
+ * Tông màu chủ đạo: Indigo / Slate chuyên nghiệp chuẩn sàn TMĐT công nghệ.
  * ========================================================================== */
 
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
-  --primary: #0f766e;
-  --primary-foreground: #f0fdfa;
-  --muted: #e2e8f0;
+  --surface: #ffffff;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-foreground: #eef2ff;
+  --secondary: #0f172a;
+  --secondary-foreground: #f8fafc;
+  --exchange: #7c3aed;
+  --exchange-foreground: #f5f3ff;
+  --muted: #f1f5f9;
   --muted-foreground: #475569;
-  --border: #cbd5e1;
+  --border: #e2e8f0;
   --danger: #dc2626;
+  --warning: #d97706;
   --success: #16a34a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-exchange: var(--exchange);
+  --color-exchange-foreground: var(--exchange-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border-subtle: var(--border);
   --color-danger: var(--danger);
+  --color-warning: var(--warning);
   --color-success: var(--success);
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 body {

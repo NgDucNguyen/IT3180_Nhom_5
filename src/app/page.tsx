@@ -1,100 +1,325 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { Container } from "@/components/layout";
+import { EmptyState, ListingCard } from "@/components/ui";
+import { getHomeFeaturedData } from "@/features/discovery";
+import { CONDITION_LABEL_VI, CONDITION_VALUES } from "@/lib/constants";
 
-/**
- * TRANG CHỦ TẠM (BASE PLACEHOLDER)
- *
- * Đây là trang chứng minh toàn bộ chuỗi công nghệ đã thông:
- * Next.js App Router -> Prisma -> SQLite -> render dữ liệu seed.
- *
- * ⚠️ TV4 (UI/UX Lead) SẼ THAY THẾ TRANG NÀY bằng trang Khám phá thật
- * (danh sách sản phẩm + tìm kiếm + bộ lọc). Trang hiện tại chỉ để cả nhóm
- * xác nhận môi trường chạy đúng.
- */
 export const dynamic = "force-dynamic";
 
+/**
+ * Trang chủ (/) — Sàn Mua Bán & Trao Đổi Thiết Bị Điện Tử ElectroSwap C2C.
+ * Lấy dữ liệu thật từ Prisma SQLite Database.
+ *
+ * Chủ sở hữu: TV4 (UI/UX Lead & Module Discovery).
+ */
 export default async function HomePage() {
-  const [categories, brands, listingCount] = await Promise.all([
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
-    prisma.brand.findMany({ orderBy: { name: "asc" } }),
-    prisma.listing.count(),
-  ]);
+  const { catalog, exchangeListings, latestListings } =
+    await getHomeFeaturedData();
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-12">
-      <header className="mb-10 border-b border-border-subtle pb-6">
-        <p className="text-sm font-medium text-primary">
-          IT3180 · Nhóm 5 · Base Project
-        </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight">
-          Chợ Thiết Bị Điện Tử
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          Mua bán và trao đổi thiết bị điện tử đã qua sử dụng. Đây là trang tạm
-          để kiểm tra môi trường — TV4 sẽ thay bằng trang Khám phá.
-        </p>
-      </header>
+    <main className="pb-16">
+      {/* 1. HERO BANNER + TÌM KIẾM & LỌC NHANH */}
+      <section className="relative overflow-hidden border-b border-slate-800 bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 py-12 text-white sm:py-16">
+        <Container>
+          <div className="grid items-center gap-10 lg:grid-cols-12">
+            <div className="lg:col-span-7">
+              <div className="inline-flex items-center gap-2 rounded-full border border-indigo-400/30 bg-indigo-500/15 px-3.5 py-1 text-xs font-semibold text-indigo-300">
+                <span aria-hidden>⚡</span>
+                <span>Sàn C2C Thiết Bị Công Nghệ · Nhóm 5 (IT3180)</span>
+              </div>
 
-      <section className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Danh mục" value={categories.length} />
-        <StatCard label="Thương hiệu" value={brands.length} />
-        <StatCard label="Tin đăng" value={listingCount} />
-      </section>
+              <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+                Mua bán &amp;{" "}
+                <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+                  Trao đổi thiết bị điện tử
+                </span>{" "}
+                minh bạch, chuẩn thông số
+              </h1>
 
-      <section className="mt-10">
-        <h2 className="mb-3 text-lg font-semibold">Danh mục</h2>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category) => (
-            <li
-              key={category.id}
-              className="rounded-lg border border-border-subtle bg-white p-4"
-            >
-              <span className="text-xl" aria-hidden>
-                {category.icon ?? "📦"}
-              </span>
-              <p className="mt-1 font-medium">{category.name}</p>
-              <p className="text-sm text-muted-foreground">
-                {category.description}
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base">
+                Tìm kiếm điện thoại, laptop, máy tính bảng và phụ kiện chính
+                hãng. So sánh bảng thông số kỹ thuật chuẩn hoá, gửi yêu cầu mua
+                hoặc đề nghị đổi máy (Trade-in) trực tiếp với người bán.
               </p>
-            </li>
-          ))}
-        </ul>
+
+              {/* Form tìm kiếm & lọc nhanh ngay trên Trang chủ */}
+              <form
+                action="/listings"
+                method="GET"
+                className="mt-6 rounded-2xl border border-slate-700/80 bg-slate-900/90 p-3 shadow-xl backdrop-blur-xs"
+              >
+                <div className="grid gap-2.5 sm:grid-cols-12">
+                  <div className="sm:col-span-6">
+                    <label htmlFor="home-search-q" className="sr-only">
+                      Từ khoá tìm kiếm
+                    </label>
+                    <input
+                      id="home-search-q"
+                      type="search"
+                      name="q"
+                      placeholder="Nhập tên máy: iPhone 15, MacBook M3, S24 Ultra..."
+                      className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-white placeholder-slate-400 focus:border-indigo-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-3">
+                    <label htmlFor="home-search-category" className="sr-only">
+                      Chọn danh mục
+                    </label>
+                    <select
+                      id="home-search-category"
+                      name="category"
+                      className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-slate-200 focus:border-indigo-500 focus:outline-none"
+                    >
+                      <option value="">Mọi danh mục</option>
+                      {catalog.categories.map((cat) => (
+                        <option key={cat.id} value={cat.slug}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="sm:col-span-3">
+                    <button
+                      type="submit"
+                      className="w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-indigo-500"
+                    >
+                      Khám phá ngay
+                    </button>
+                  </div>
+                </div>
+
+                {/* Các tag lọc nhanh dưới thanh tìm kiếm */}
+                <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-800 pt-2.5 text-xs text-slate-400">
+                  <span className="font-medium text-slate-300">Lọc nhanh:</span>
+                  <Link
+                    href="/listings?allowExchange=true"
+                    className="rounded-full bg-violet-500/20 px-2.5 py-0.5 font-semibold text-violet-300 ring-1 ring-violet-400/30 hover:bg-violet-500/30"
+                  >
+                    🔄 Nhận trao đổi ({catalog.totalExchangeListings})
+                  </Link>
+                  {CONDITION_VALUES.map((cond) => (
+                    <Link
+                      key={cond}
+                      href={`/listings?condition=${cond}`}
+                      className="rounded-full bg-slate-800 px-2.5 py-0.5 text-slate-300 hover:bg-slate-700 hover:text-white"
+                    >
+                      {CONDITION_LABEL_VI[cond]}
+                    </Link>
+                  ))}
+                </div>
+              </form>
+            </div>
+
+            {/* Cột phải: Thống kê trực tiếp từ Prisma Database */}
+            <div className="grid grid-cols-2 gap-3.5 lg:col-span-5">
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
+                <span className="text-2xl" aria-hidden>
+                  📱
+                </span>
+                <p className="mt-2 text-2xl font-extrabold text-white">
+                  {catalog.totalActiveListings}
+                </p>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  Thiết bị đang mở bán công khai
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-violet-500/30 bg-violet-950/30 p-5">
+                <span className="text-2xl" aria-hidden>
+                  🔄
+                </span>
+                <p className="mt-2 text-2xl font-extrabold text-violet-300">
+                  {catalog.totalExchangeListings}
+                </p>
+                <p className="mt-0.5 text-xs text-violet-200/80">
+                  Hỗ trợ trao đổi / bù trừ tiền
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
+                <span className="text-2xl" aria-hidden>
+                  🗂️
+                </span>
+                <p className="mt-2 text-2xl font-extrabold text-white">
+                  {catalog.categories.length}
+                </p>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  Danh mục thiết bị chuẩn hoá
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
+                <span className="text-2xl" aria-hidden>
+                  🏷️
+                </span>
+                <p className="mt-2 text-2xl font-extrabold text-white">
+                  {catalog.brands.length}
+                </p>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  Thương hiệu công nghệ lớn
+                </p>
+              </div>
+            </div>
+          </div>
+        </Container>
       </section>
 
+      {/* 2. DANH MỤC NỔI BẬT (LẤY TỪ PRISMA DB) */}
       <section className="mt-10">
-        <h2 className="mb-3 text-lg font-semibold">Thương hiệu</h2>
-        <div className="flex flex-wrap gap-2">
-          {brands.map((brand) => (
-            <span
-              key={brand.id}
-              className="rounded-full border border-border-subtle bg-white px-3 py-1 text-sm"
+        <Container>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-extrabold tracking-tight text-slate-900">
+                Danh mục thiết bị nổi bật
+              </h2>
+              <p className="mt-1 text-xs text-slate-600">
+                Chọn nhóm sản phẩm để lọc nhanh theo nhu cầu sử dụng của bạn
+              </p>
+            </div>
+            <Link
+              href="/listings"
+              className="text-xs font-bold text-indigo-600 hover:text-indigo-700 hover:underline"
             >
-              {brand.name}
+              Xem tất cả danh mục →
+            </Link>
+          </div>
+
+          <div className="mt-5 grid gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+            {catalog.categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/listings?category=${category.slug}`}
+                className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-2xl transition group-hover:bg-indigo-600 group-hover:text-white">
+                      {category.icon ?? "📦"}
+                    </span>
+                    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700 group-hover:bg-indigo-50 group-hover:text-indigo-700">
+                      {category.activeCount} máy
+                    </span>
+                  </div>
+                  <h3 className="mt-3 text-sm font-bold text-slate-900 group-hover:text-indigo-600">
+                    {category.name}
+                  </h3>
+                  <p className="mt-1 line-clamp-2 text-xs text-slate-500">
+                    {category.description}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Thanh lọc nhanh theo Thương hiệu (Brand) */}
+          <div className="mt-5 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3">
+            <span className="text-xs font-bold text-slate-700">
+              Thương hiệu phổ biến:
             </span>
-          ))}
-        </div>
+            {catalog.brands.map((brand) => (
+              <Link
+                key={brand.id}
+                href={`/listings?brand=${brand.slug}`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
+              >
+                <span>{brand.name}</span>
+                <span className="text-[10px] text-slate-400">
+                  ({brand.activeCount})
+                </span>
+              </Link>
+            ))}
+          </div>
+        </Container>
       </section>
 
-      <footer className="mt-12 flex flex-wrap gap-4 border-t border-border-subtle pt-6 text-sm">
-        <Link className="text-primary underline" href="/api/categories">
-          GET /api/categories
-        </Link>
-        <Link className="text-primary underline" href="/api/brands">
-          GET /api/brands
-        </Link>
-        <span className="text-muted-foreground">
-          Xem AGENTS.md để biết phân vùng code của từng thành viên.
-        </span>
-      </footer>
-    </main>
-  );
-}
+      {/* 3. KHU VỰC NỔI BẬT: THIẾT BỊ NHẬN TRAO ĐỔI (ALLOW_EXCHANGE = TRUE) */}
+      <section className="mt-12">
+        <Container>
+          <div className="rounded-3xl border border-violet-200 bg-gradient-to-br from-violet-50/80 via-white to-indigo-50/50 p-6 sm:p-8">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <span className="inline-flex items-center gap-1 rounded-full bg-violet-600 px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                  🔄 Tính năng nổi bật ElectroSwap
+                </span>
+                <h2 className="mt-2 text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
+                  Thiết bị sẵn sàng Nhận Trao Đổi (Trade-in / Swap)
+                </h2>
+                <p className="mt-1 text-xs text-slate-600 sm:text-sm">
+                  Đề nghị đổi thiết bị đang sở hữu của bạn lấy máy khác, hỗ trợ
+                  thương lượng tiền bù trừ minh bạch.
+                </p>
+              </div>
+              <Link
+                href="/listings?allowExchange=true"
+                className="rounded-xl bg-violet-600 px-4 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-violet-500"
+              >
+                Xem tất cả máy nhận đổi ({catalog.totalExchangeListings}) →
+              </Link>
+            </div>
 
-function StatCard({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-lg border border-border-subtle bg-white p-5">
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="mt-1 text-2xl font-semibold">{value}</p>
-    </div>
+            {exchangeListings.length > 0 ? (
+              <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {exchangeListings.map((listing) => (
+                  <ListingCard key={listing.id} listing={listing} />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-6">
+                <EmptyState
+                  icon="🔄"
+                  title="Chưa có thiết bị mở trao đổi"
+                  description="Hãy là người đầu tiên đăng tin thiết bị bật tính năng Nhận trao đổi."
+                  actionLabel="Đăng tin ngay"
+                  actionHref="/listings/create"
+                />
+              </div>
+            )}
+          </div>
+        </Container>
+      </section>
+
+      {/* 4. DANH SÁCH TIN ĐĂNG MỚI NHẤT TRÊN SÀN */}
+      <section className="mt-12">
+        <Container>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
+                Tin đăng thiết bị mới nhất
+              </h2>
+              <p className="mt-1 text-xs text-slate-600 sm:text-sm">
+                Tất cả sản phẩm đã được kiểm duyệt và đang mở giao dịch công
+                khai (`status = ACTIVE`)
+              </p>
+            </div>
+            <Link
+              href="/listings"
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-bold text-slate-800 transition hover:border-indigo-300 hover:text-indigo-600"
+            >
+              Mở bộ lọc nâng cao →
+            </Link>
+          </div>
+
+          {latestListings.length > 0 ? (
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {latestListings.map((listing) => (
+                <ListingCard key={listing.id} listing={listing} />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-6">
+              <EmptyState
+                icon="📦"
+                title="Chưa có tin đăng nào đang mở bán"
+                description="Vui lòng chạy lệnh npx prisma db seed hoặc đăng tin bán thiết bị mới."
+                actionLabel="Đăng tin bán thiết bị"
+                actionHref="/listings/create"
+              />
+            </div>
+          )}
+        </Container>
+      </section>
+    </main>
   );
 }

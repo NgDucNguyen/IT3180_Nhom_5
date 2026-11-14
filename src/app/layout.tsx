@@ -1,26 +1,29 @@
 import type { Metadata } from "next";
+import { Footer, Navbar } from "@/components/layout";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Chợ Thiết Bị Điện Tử | Nhóm 5",
+  title: "ElectroSwap C2C | Sàn Mua Bán & Trao Đổi Thiết Bị Điện Tử - Nhóm 5",
   description:
-    "Nền tảng mua bán và trao đổi thiết bị điện tử - IT3180 Nhóm 5",
+    "Nền tảng thương mại điện tử C2C cho phép mua bán và trao đổi thiết bị điện tử mới/đã qua sử dụng — Học phần Nhập môn Công nghệ phần mềm (IT3180) Nhóm 5",
 };
 
 /**
- * Root layout - khung chung của toàn ứng dụng.
+ * Root Layout — Bộ khung giao diện dùng chung cho toàn bộ dự án.
  *
- * ⚠️ PHÂN VÙNG: TV4 (UI/UX Lead) chịu trách nhiệm thêm Navbar/Footer/Theme
- * bằng cách import component từ src/components/layout/ vào đây.
- * Các thành viên khác KHÔNG sửa file này mà tạo layout riêng trong route group
- * của mình, ví dụ: src/app/(auth)/layout.tsx
+ * ⚠️ PHÂN VÙNG: TV4 (UI/UX Lead) sở hữu file này.
+ * Các thành viên khác KHÔNG sửa file này để tránh Merge Conflict.
  */
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="vi">
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="flex min-h-screen flex-col bg-background text-foreground antialiased">
+        <Navbar />
+        <div className="flex-1">{children}</div>
+        <Footer />
+      </body>
     </html>
   );
 }
