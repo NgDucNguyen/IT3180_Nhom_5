@@ -1,1 +1,5 @@
-export { default } from "@/app/(auth)/login/page";
+import { AuthForm } from "@/features/auth/components/AuthForm";
+
+export default function RegisterPage() {
+  return <AuthForm mode="register" />;
+}
