@@ -74,8 +74,21 @@ flowchart TD
 ```
 
 ### 5.4 Activity Diagram — Xác nhận và hủy giao dịch
-(Vẽ tương tự 5.3: kiểm tra người gọi → kiểm tra `IN_PROGRESS` → bật cờ → đủ 2 cờ thì
-`COMPLETED` + listing `SOLD`; nhánh hủy thì `CANCELLED` + listing `ACTIVE`.)
+```mermaid
+flowchart TD
+    A["Người dùng bấm Xác nhận hoặc Hủy"] --> B{"Giao dịch tồn tại?"}
+    B -- Không --> E1["404 NOT_FOUND"]
+    B -- Có --> C{"Là buyer hoặc seller của giao dịch?"}
+    C -- Không --> E2["403 FORBIDDEN"]
+    C -- Có --> D{"Giao dịch đang IN_PROGRESS?"}
+    D -- Không --> E3["409 CONFLICT"]
+    D -- Có --> F{"Hành động?"}
+    F -- Xác nhận --> G["Bật cờ của người gọi"]
+    G --> H{"buyerConfirmed và sellerConfirmed?"}
+    H -- Chưa đủ --> I["Giữ IN_PROGRESS và trả 200"]
+    H -- Đủ --> J["COMPLETED, set completedAt, listing thành SOLD"]
+    F -- Hủy --> K["CANCELLED, listing IN_TRANSACTION thành ACTIVE"]
+```
 
 ## 6. Cơ chế chống Double-Booking
 **Vấn đề:** hai request A và B cùng nhắm một listing, hai lần bấm accept gần như đồng thời.
