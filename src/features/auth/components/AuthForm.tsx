@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Container } from "@/components/layout";
 import { Button, Card, Input } from "@/components/ui";
+import { notifyAuthChanged } from "@/features/cart";
 import { isValidPhoneNumber } from "@/features/auth/phone";
 
 const DEMO_ACCOUNTS = [
@@ -65,6 +66,8 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         setError(message);
         return;
       }
+      // Đồng bộ lại Navbar và giỏ hàng sau khi đăng nhập/đăng ký thành công.
+      notifyAuthChanged();
       // Điều hướng cố định trong ứng dụng, không nhận URL tùy ý từ người gửi.
       router.replace("/listings");
       router.refresh();

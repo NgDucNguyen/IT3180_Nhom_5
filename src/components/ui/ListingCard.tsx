@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AddToCartButton } from "@/features/cart";
 import { PriceText } from "./PriceText";
 import { StatusBadge } from "./StatusBadge";
 
@@ -169,14 +170,18 @@ export function ListingCard({
           </div>
 
           {listing.seller && (
-            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+            <div className="mt-2 flex items-center justify-between gap-2 text-[11px] text-slate-500">
               <span className="truncate">
                 Người bán:{" "}
                 <strong className="font-medium text-slate-700">
                   {listing.seller.fullName}
                 </strong>
               </span>
-              <span>{brandName}</span>
+              <AddToCartButton
+                listingId={listing.id}
+                sellerId={listing.seller.id}
+                variant="card"
+              />
             </div>
           )}
         </div>

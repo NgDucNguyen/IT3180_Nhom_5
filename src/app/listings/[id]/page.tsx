@@ -269,6 +269,7 @@ export default async function ListingDetailPage({
                   allowExchange={listing.allowExchange}
                   exchangePreference={listing.exchangePreference}
                   isAvailableForDeal={listing.isAvailableForDeal}
+                  sellerId={listing.seller.id}
                   sellerName={listing.seller.fullName}
                 />
               </div>

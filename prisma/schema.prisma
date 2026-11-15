@@ -48,6 +48,7 @@ model User {
   dealsAsBuyer     Transaction[]     @relation("DealBuyer")
   dealsAsSeller    Transaction[]     @relation("DealSeller")
   reports          Report[]
+  cartItems        CartItem[]
 
   @@index([role])
   @@index([status])
@@ -119,6 +120,7 @@ model Listing {
   dealsAsPrimary         Transaction[]     @relation("DealPrimaryListing")
   dealsAsSecondary       Transaction[]     @relation("DealSecondaryListing")
   reports                Report[]
+  cartItems              CartItem[]
 
   @@index([sellerId])
   @@index([categoryId])
@@ -246,4 +248,24 @@ model Report {
   @@index([listingId])
   @@index([reporterId])
   @@map("reports")
+}
+
+// ---------------------------------------------------------------------------
+// 9. CART ITEM  (giỏ hàng lưu theo người dùng)
+// Mỗi người dùng chỉ lưu tối đa 1 bản ghi cho mỗi tin đăng (@@unique([userId, listingId])).
+// Không cho phép thêm tin của chính mình hoặc tin không còn ACTIVE.
+// ---------------------------------------------------------------------------
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@index([userId, createdAt])
+  @@index([listingId])
+  @@map("cart_items")
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Footer, Navbar } from "@/components/layout";
+import { AppSessionProvider } from "@/features/cart";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,9 +21,11 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className="flex min-h-screen flex-col bg-background text-foreground antialiased">
-        <Navbar />
-        <div className="flex-1">{children}</div>
-        <Footer />
+        <AppSessionProvider>
+          <Navbar />
+          <div className="flex-1">{children}</div>
+          <Footer />
+        </AppSessionProvider>
       </body>
     </html>
   );

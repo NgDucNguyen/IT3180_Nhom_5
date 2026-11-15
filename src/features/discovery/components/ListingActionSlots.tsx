@@ -11,6 +11,7 @@ import {
   formatPriceVnd,
   type SelectOption,
 } from "@/components/ui";
+import { AddToCartButton } from "@/features/cart";
 
 const REPORT_REASON_OPTIONS: SelectOption[] = [
   { value: "FRAUD", label: "Dấu hiệu lừa đảo / chiếm đoạt" },
@@ -27,6 +28,7 @@ export interface ListingActionSlotsProps {
   allowExchange: boolean;
   exchangePreference: string | null;
   isAvailableForDeal: boolean;
+  sellerId?: string;
   sellerName: string;
 }
 
@@ -49,6 +51,7 @@ export function ListingActionSlots({
   allowExchange,
   exchangePreference,
   isAvailableForDeal,
+  sellerId,
   sellerName,
 }: ListingActionSlotsProps) {
   const [activeSlot, setActiveSlot] = useState<ActiveSlotModal>(null);
@@ -60,6 +63,15 @@ export function ListingActionSlots({
 
   return (
     <div className="space-y-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-3.5 shadow-2xs">
+        <AddToCartButton
+          listingId={listingId}
+          sellerId={sellerId}
+          disabled={!isAvailableForDeal}
+          variant="detail"
+        />
+      </div>
+
       {/* Khung chính chứa 2 nút giao dịch cốt lõi: MUA (TV5) & TRAO ĐỔI (TV7) */}
       <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 sm:p-5">
         <div className="mb-3 flex items-center justify-between">
