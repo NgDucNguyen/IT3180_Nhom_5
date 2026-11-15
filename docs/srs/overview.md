@@ -56,7 +56,7 @@ Dự án chạy local; không triển khai hosting hoặc CI/CD trong phạm vi 
 | UC-AUTH-01–03 | Đăng ký, đăng nhập, đăng xuất | Guest/User | TV1 |
 | UC-AUTH-04 | Xem/cập nhật hồ sơ | User | TV1 |
 | UC-CAT-01–02 | Xem danh mục, thương hiệu | Guest/User | TV2 |
-| UC-LIST-01 | Tạo và quản lý tin của mình | User (người bán) | TV3 |
+| UC-LST-01–04 | Tạo, xem danh sách, sửa, ẩn/bỏ ẩn tin của mình | User (người bán) | TV3 |
 | UC-DISC-01–03 | Tìm kiếm, lọc, xem chi tiết | Guest/User | TV4 |
 | UC-PUR-01 | Gửi/xem/hủy yêu cầu mua | User (người mua) | TV5 |
 | UC-TRX-01 | Xử lý yêu cầu mua, xác nhận/hủy giao dịch | User (hai bên) | TV6 |
@@ -112,7 +112,8 @@ flowchart LR
    trao đổi hoàn tất chuyển cả hai tin EXCHANGED. Hủy mở lại tin về ACTIVE theo state machine.
 5. SOLD/EXCHANGED là trạng thái cuối; không cho sửa tin đang IN_TRANSACTION hoặc đã kết thúc.
 6. Sửa nội dung tin ACTIVE phải quay về PENDING để duyệt lại.
-   Helper state machine hiện thiếu cạnh ACTIVE → PENDING: TV2 và TV3 cần phối hợp trước Sprint 2.
+   Helper state machine hiện thiếu cạnh ACTIVE → PENDING: service sửa tin TV3 thực hiện
+   quy tắc duyệt lại sau guard isListingEditable; TV2 phụ trách thống nhất helper chung.
 7. Chỉ chủ thể hợp lệ được sửa dữ liệu của mình; chỉ ADMIN thực hiện nghiệp vụ quản trị.
 8. Tiền là số nguyên VND. User không được tự gán role/status thông qua đăng ký.
 
@@ -147,3 +148,21 @@ Helper guard có sẵn không đồng nghĩa mọi route của nhóm đã đư�
 - JWT stateless chưa có thu hồi từng token hoặc rate limit login trong Sprint 1.
 - Tài liệu proposal/workbook cũ có luồng chỉ buyer xác nhận; bản hiện thực tuân thủ
   quy tắc hai bên xác nhận trong AGENTS.md và mô hình Transaction hiện tại.
+
+## 8. Phạm vi TV3 Sprint 1 và truy vết tổng hợp
+
+TV3 thực hiện checklist chi tiết trong MEMBER-GUIDEBOOK, gồm tạo, xem danh sách,
+sửa và ẩn/bỏ ẩn tin. [SRS tin đăng](module-tv3-listing.md) đặc tả UC-LST-01–04,
+US-LST-01–04, các luồng ngoại lệ, Mermaid và tiêu chí AC-LST-01–07.
+
+| Đầu ra | Truy vết |
+|---|---|
+| Tạo tin PENDING theo user từ phiên | POST `/api/listings`, UC-LST-01 |
+| Tin cá nhân đủ trạng thái, lọc/phân trang | GET `/api/listings?mine=true`, UC-LST-02 |
+| Sửa nội dung và duyệt lại, bảo vệ ownership/trạng thái | PATCH `/api/listings/[id]`, UC-LST-03 |
+| Ẩn/bỏ ẩn tin đã duyệt | PATCH `/api/listings/[id]/hide`, UC-LST-04 |
+| Form và quản lý tin | `/listings/create`, `/seller/listings`, alias `/my-listings` |
+| Kiểm chứng | `tests/listing.test.ts`, browser-check và ảnh trong feature TV3 |
+
+Không sửa schema, helper TV2, UI kit/layout TV4 hoặc module của thành viên khác.
+Không triển khai xóa/upload ảnh hay các luồng mua/trao đổi trong task này.

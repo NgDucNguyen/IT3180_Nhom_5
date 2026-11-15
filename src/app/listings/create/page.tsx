@@ -1,37 +1,25 @@
-import { ModulePlaceholder } from "@/components/ui";
-import { LISTING_STATUS } from "@/lib/constants";
+import Link from "next/link";
+import { Container } from "@/components/layout";
+import { ListingForm } from "@/features/listing/components/ListingForm";
+import { requireListingPageUser } from "@/features/listing/page-auth";
 
-/**
- * Trang khung Đăng tin bán mới — Bàn giao cho TV3 (BA Lead / Module Seller Listing).
- */
-export default function CreateListingPage() {
+export const dynamic = "force-dynamic";
+
+export default async function CreateListingPage() {
+  await requireListingPageUser();
   return (
-    <ModulePlaceholder
-      memberId="TV3"
-      memberRole="BA Lead"
-      moduleTitle="Đăng tin bán & Trao đổi thiết bị"
-      routePath="/listings/create"
-      featureDir="src/features/listing/** · src/app/api/listings/**"
-      description="Trang khung dành cho Thành viên 3 xây dựng biểu mẫu đăng tin thiết bị điện tử mới/đã qua sử dụng, nhập bảng thông số kỹ thuật (specsJson) và tùy chọn nhận trao đổi (allowExchange)."
-      checklist={[
-        "Nhập tiêu đề, mô tả, giá bán (VNĐ), chọn Danh mục (Category) và Thương hiệu (Brand).",
-        "Chọn tình trạng phần cứng (NEW, LIKE_NEW, GOOD, FAIR) và nhập thông số kỹ thuật (specsJson).",
-        "Bật/tắt tùy chọn Nhận trao đổi (allowExchange) và nhập ghi chú thiết bị muốn đổi (exchangePreference).",
-        "Gửi POST /api/listings tạo tin ở trạng thái PENDING chờ Admin duyệt.",
-      ]}
-      sampleEndpoints={[
-        "POST /api/listings",
-        "GET  /api/categories",
-        "GET  /api/brands",
-      ]}
-      sampleStatuses={{
-        entity: "listing",
-        values: [
-          LISTING_STATUS.PENDING,
-          LISTING_STATUS.ACTIVE,
-          LISTING_STATUS.REJECTED,
-        ],
-      }}
-    />
+    <main className="py-8 sm:py-12">
+      <Container>
+        <div className="mx-auto max-w-4xl">
+          <Link href="/seller/listings" className="text-sm font-semibold text-slate-500 hover:text-indigo-600">← Tin đăng của tôi</Link>
+          <div className="mb-7 mt-5">
+            <p className="text-xs font-bold uppercase tracking-wider text-indigo-600">Góc người bán</p>
+            <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">Đăng tin thiết bị</h1>
+            <p className="mt-3 text-sm leading-relaxed text-slate-500">Điền thông tin thiết bị của bạn. Tin sẽ được quản trị viên duyệt trước khi hiển thị công khai.</p>
+          </div>
+          <ListingForm />
+        </div>
+      </Container>
+    </main>
   );
 }
