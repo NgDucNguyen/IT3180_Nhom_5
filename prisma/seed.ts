@@ -6,8 +6,8 @@
  *
  * Đặc điểm:
  *  - IDEMPOTENT: dùng upsert nên chạy nhiều lần không bị nhân đôi dữ liệu.
- *  - Có đủ 5 Category, 6 Brand, 1 Admin + 3 User, 10 Listing đa dạng trạng thái
- *    (ACTIVE / PENDING / HIDDEN / SOLD) và có cả tin cho phép trao đổi.
+ *  - Có đủ 5 Category, 6 Brand, 1 Admin + 3 User, 11 Listing đa dạng trạng thái
+ *    (ACTIVE / PENDING / SOLD) và có cả tin cho phép trao đổi.
  *
  * Tài khoản demo (mật khẩu giống nhau để dễ test):
  *  - admin@nhom5.vn  / 123456   (ADMIN)

@@ -112,9 +112,9 @@ Module này **không có giao diện người dùng riêng** ở thời điểm 
 
 | Yêu cầu | File hiện thực | Test |
 |---|---|---|
-| FR-2.01 | `prisma/schema.prisma` | `docs/diagrams/erd.md` |
-| FR-2.02 | `src/app/api/categories/route.ts` | kiểm thử thủ công + `tests/` |
-| FR-2.03 | `src/app/api/brands/route.ts` | kiểm thử thủ công |
-| FR-2.04 | `prisma/seed.ts` | đếm bản ghi sau seed |
-| FR-2.06 | `src/lib/listing-state.ts` | `tests/listing-state.test.ts` |
-| FR-2.07 | `src/lib/api-response.ts` | — |
+| FR-2.01 | `prisma/schema.prisma` | `docs/diagrams/erd.md`, `docs/diagrams/architecture.md` |
+| FR-2.02 | `src/features/catalog/queries.ts`, `src/app/api/categories/route.ts` | `tests/api-catalog.test.ts` |
+| FR-2.03 | `src/features/catalog/queries.ts`, `src/app/api/brands/route.ts` | `tests/api-catalog.test.ts` |
+| FR-2.04 | `prisma/seed.ts` | `tests/api-catalog.test.ts` |
+| FR-2.06 | `src/lib/listing-state.ts`, `src/lib/constants.ts` | `tests/listing-state.test.ts` |
+| FR-2.07 | `src/lib/api-response.ts` | `tests/api-catalog.test.ts` |
