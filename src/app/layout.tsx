@@ -3,7 +3,7 @@ import { Footer, Navbar } from "@/components/layout";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ElectroSwap C2C | Sàn Mua Bán & Trao Đổi Thiết Bị Điện Tử - Nhóm 5",
+  title: "Elade C2C | Sàn Mua Bán & Trao Đổi Thiết Bị Điện Tử - Nhóm 5",
   description:
     "Nền tảng thương mại điện tử C2C cho phép mua bán và trao đổi thiết bị điện tử mới/đã qua sử dụng — Học phần Nhập môn Công nghệ phần mềm (IT3180) Nhóm 5",
 };

@@ -21,19 +21,13 @@ export default async function HomePage() {
       {/* 1. HERO BANNER + TÌM KIẾM & LỌC NHANH */}
       <section className="relative overflow-hidden border-b border-slate-800 bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 py-12 text-white sm:py-16">
         <Container>
-          <div className="grid items-center gap-10 lg:grid-cols-12">
-            <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-2 rounded-full border border-indigo-400/30 bg-indigo-500/15 px-3.5 py-1 text-xs font-semibold text-indigo-300">
-                <span aria-hidden>⚡</span>
-                <span>Sàn C2C Thiết Bị Công Nghệ · Nhóm 5 (IT3180)</span>
-              </div>
-
-              <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+          <div className="max-w-3xl">
+            <div>
+              <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
                 Mua bán &amp;{" "}
                 <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
                   Trao đổi thiết bị điện tử
-                </span>{" "}
-                minh bạch, chuẩn thông số
+                </span>
               </h1>
 
               <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base">
@@ -111,57 +105,6 @@ export default async function HomePage() {
                 </div>
               </form>
             </div>
-
-            {/* Cột phải: Thống kê trực tiếp từ Prisma Database */}
-            <div className="grid grid-cols-2 gap-3.5 lg:col-span-5">
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
-                <span className="text-2xl" aria-hidden>
-                  📱
-                </span>
-                <p className="mt-2 text-2xl font-extrabold text-white">
-                  {catalog.totalActiveListings}
-                </p>
-                <p className="mt-0.5 text-xs text-slate-400">
-                  Thiết bị đang mở bán công khai
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-violet-500/30 bg-violet-950/30 p-5">
-                <span className="text-2xl" aria-hidden>
-                  🔄
-                </span>
-                <p className="mt-2 text-2xl font-extrabold text-violet-300">
-                  {catalog.totalExchangeListings}
-                </p>
-                <p className="mt-0.5 text-xs text-violet-200/80">
-                  Hỗ trợ trao đổi / bù trừ tiền
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
-                <span className="text-2xl" aria-hidden>
-                  🗂️
-                </span>
-                <p className="mt-2 text-2xl font-extrabold text-white">
-                  {catalog.categories.length}
-                </p>
-                <p className="mt-0.5 text-xs text-slate-400">
-                  Danh mục thiết bị chuẩn hoá
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
-                <span className="text-2xl" aria-hidden>
-                  🏷️
-                </span>
-                <p className="mt-2 text-2xl font-extrabold text-white">
-                  {catalog.brands.length}
-                </p>
-                <p className="mt-0.5 text-xs text-slate-400">
-                  Thương hiệu công nghệ lớn
-                </p>
-              </div>
-            </div>
           </div>
         </Container>
       </section>
@@ -174,9 +117,6 @@ export default async function HomePage() {
               <h2 className="text-xl font-extrabold tracking-tight text-slate-900">
                 Danh mục thiết bị nổi bật
               </h2>
-              <p className="mt-1 text-xs text-slate-600">
-                Chọn nhóm sản phẩm để lọc nhanh theo nhu cầu sử dụng của bạn
-              </p>
             </div>
             <Link
               href="/listings"
@@ -240,22 +180,15 @@ export default async function HomePage() {
           <div className="rounded-3xl border border-violet-200 bg-gradient-to-br from-violet-50/80 via-white to-indigo-50/50 p-6 sm:p-8">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
-                <span className="inline-flex items-center gap-1 rounded-full bg-violet-600 px-2.5 py-0.5 text-[11px] font-semibold text-white">
-                  🔄 Tính năng nổi bật ElectroSwap
-                </span>
-                <h2 className="mt-2 text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
-                  Thiết bị sẵn sàng Nhận Trao Đổi (Trade-in / Swap)
+                <h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
+                  Thiết bị sẵn sàng Trao Đổi
                 </h2>
-                <p className="mt-1 text-xs text-slate-600 sm:text-sm">
-                  Đề nghị đổi thiết bị đang sở hữu của bạn lấy máy khác, hỗ trợ
-                  thương lượng tiền bù trừ minh bạch.
-                </p>
               </div>
               <Link
                 href="/listings?allowExchange=true"
                 className="rounded-xl bg-violet-600 px-4 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-violet-500"
               >
-                Xem tất cả máy nhận đổi ({catalog.totalExchangeListings}) →
+                Xem tất cả ({catalog.totalExchangeListings}) →
               </Link>
             </div>
 
@@ -288,10 +221,6 @@ export default async function HomePage() {
               <h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
                 Tin đăng thiết bị mới nhất
               </h2>
-              <p className="mt-1 text-xs text-slate-600 sm:text-sm">
-                Tất cả sản phẩm đã được kiểm duyệt và đang mở giao dịch công
-                khai (`status = ACTIVE`)
-              </p>
             </div>
             <Link
               href="/listings"

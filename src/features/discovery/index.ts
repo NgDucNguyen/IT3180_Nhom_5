@@ -9,3 +9,7 @@ export {
   ListingActionSlots,
   type ListingActionSlotsProps,
 } from "./components/ListingActionSlots";
+export {
+  ListingImageGallery,
+  type ListingImageGalleryProps,
+} from "./components/ListingImageGallery";

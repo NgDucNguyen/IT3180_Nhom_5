@@ -88,12 +88,6 @@ export default async function ListingsPage({
               <span className="rounded-lg bg-slate-100 px-3 py-1.5 font-semibold text-slate-800">
                 Tìm thấy <strong>{total}</strong> thiết bị phù hợp
               </span>
-              <Link
-                href="/listings/create"
-                className="rounded-lg bg-indigo-600 px-3.5 py-1.5 font-semibold text-white hover:bg-indigo-500"
-              >
-                ＋ Đăng tin bán
-              </Link>
             </div>
           </div>
 

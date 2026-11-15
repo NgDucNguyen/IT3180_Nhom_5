@@ -7,10 +7,12 @@ import {
 import {
   formatSpecLabel,
   getDiscoveryCatalog,
+  getHomeFeaturedData,
   getListingDetailById,
   normalizeDiscoverySearchParams,
   parseSpecsJson,
   searchActiveListings,
+  serializeDiscoverySearchParams,
 } from "@/features/discovery";
 import {
   CONDITION,
@@ -85,7 +87,7 @@ describe("Discovery Utils — Chuẩn hoá bộ lọc & Thông số kỹ thuật
     const specs = parseSpecsJson('{"screen":"6.7 inch","battery":"98%"}');
     expect(specs).toEqual({ screen: "6.7 inch", battery: "98%" });
     expect(formatSpecLabel("screen")).toBe("Màn hình");
-    expect( parseSpecsJson("bad-json")).toEqual({});
+    expect(parseSpecsJson("bad-json")).toEqual({});
   });
 
   it("normalizeDiscoverySearchParams tự động hoán đổi khi minPrice > maxPrice và chặn tham số sai", () => {
@@ -105,6 +107,21 @@ describe("Discovery Utils — Chuẩn hoá bộ lọc & Thông số kỹ thuật
     expect(normalized.allowExchange).toBe(true);
     expect(normalized.page).toBe(1);
   });
+
+  it("serializeDiscoverySearchParams tạo đúng đối tượng query từ bộ lọc", () => {
+    const serialized = serializeDiscoverySearchParams({
+      q: "iPhone",
+      category: "dien-thoai",
+      allowExchange: true,
+      sort: "price_asc",
+    });
+    expect(serialized).toMatchObject({
+      q: "iPhone",
+      category: "dien-thoai",
+      allowExchange: "true",
+      sort: "price_asc",
+    });
+  });
 });
 
 describe("Discovery Prisma Queries — Tìm kiếm, Lọc & Xem chi tiết (TV4)", () => {
@@ -114,6 +131,16 @@ describe("Discovery Prisma Queries — Tìm kiếm, Lọc & Xem chi tiết (TV4)
     expect(catalog.brands).toHaveLength(6);
     expect(catalog.totalActiveListings).toBeGreaterThanOrEqual(9);
     expect(catalog.totalExchangeListings).toBeGreaterThanOrEqual(6);
+  });
+
+  it("getHomeFeaturedData trả danh sách tin mới nhất và tin nhận trao đổi cho Trang chủ", async () => {
+    const homeData = await getHomeFeaturedData();
+    expect(homeData.exchangeListings.length).toBeGreaterThan(0);
+    expect(homeData.latestListings.length).toBeGreaterThan(0);
+    for (const item of homeData.exchangeListings) {
+      expect(item.allowExchange).toBe(true);
+      expect(item.status).toBe(LISTING_STATUS.ACTIVE);
+    }
   });
 
   it("searchActiveListings chỉ trả về tin ACTIVE và lọc chính xác theo tiêu chí", async () => {
@@ -127,6 +154,23 @@ describe("Discovery Prisma Queries — Tìm kiếm, Lọc & Xem chi tiết (TV4)
       expect(item.status).toBe(LISTING_STATUS.ACTIVE);
       expect(item.category.slug).toBe("laptop");
       expect(item.allowExchange).toBe(true);
+    }
+  });
+
+  it("searchActiveListings hỗ trợ sắp xếp theo giá tăng dần (price_asc) và khoảng giá", async () => {
+    const result = await searchActiveListings({
+      minPrice: "5000000",
+      maxPrice: "40000000",
+      sort: "price_asc",
+    });
+
+    expect(result.items.length).toBeGreaterThan(1);
+    for (let i = 1; i < result.items.length; i++) {
+      expect(result.items[i].price).toBeGreaterThanOrEqual(
+        result.items[i - 1].price,
+      );
+      expect(result.items[i].price).toBeGreaterThanOrEqual(5000000);
+      expect(result.items[i].price).toBeLessThanOrEqual(40000000);
     }
   });
 

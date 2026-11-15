@@ -8,6 +8,7 @@ import {
 } from "@/components/ui";
 import {
   ListingActionSlots,
+  ListingImageGallery,
   formatSpecLabel,
   getListingDetailById,
 } from "@/features/discovery";
@@ -48,7 +49,6 @@ export default async function ListingDetailPage({
   }
 
   const specEntries = Object.entries(listing.specs);
-  const coverImage = listing.images[0] ?? "/images/placeholder-device.svg";
   const brandName = listing.brand?.name ?? "Phụ kiện / Không phân biệt hãng";
   const createdDateFormatted = new Date(listing.createdAt).toLocaleDateString(
     "vi-VN",
@@ -91,69 +91,22 @@ export default async function ListingDetailPage({
         <div className="grid gap-8 lg:grid-cols-12">
           {/* CỘT TRÁI (7 cột): Ảnh thiết bị + Mô tả + Bảng thông số kỹ thuật (specsJson) */}
           <div className="space-y-6 lg:col-span-7">
-            {/* Khung hình ảnh thiết bị */}
-            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 shadow-xs">
-              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-slate-100">
-                <img
-                  src={coverImage}
-                  alt={listing.title}
-                  className="h-full w-full object-cover"
-                />
-
-                <div className="absolute left-4 top-4 flex flex-wrap items-center gap-2">
-                  <StatusBadge
-                    status={listing.condition}
-                    entity="condition"
-                    size="md"
-                    className="bg-white/95 shadow-xs"
-                  />
-                  <StatusBadge
-                    status={listing.status}
-                    entity="listing"
-                    size="md"
-                    className="bg-white/95 shadow-xs"
-                  />
-                </div>
-
-                {listing.allowExchange && (
-                  <div className="absolute right-4 top-4">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-600 px-3 py-1 text-xs font-bold text-white shadow-sm">
-                      <span aria-hidden>🔄</span>
-                      <span>Nhận trao đổi (Trade-in)</span>
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {listing.images.length > 1 && (
-                <div className="mt-3 flex gap-2 overflow-x-auto pt-1">
-                  {listing.images.map((imgUrl, idx) => (
-                    <div
-                      key={`${imgUrl}-${idx}`}
-                      className="h-16 w-20 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-50"
-                    >
-                      <img
-                        src={imgUrl}
-                        alt={`${listing.title} - ảnh ${idx + 1}`}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Bộ sưu tập hình ảnh tương tác */}
+            <ListingImageGallery
+              title={listing.title}
+              images={listing.images}
+              condition={listing.condition}
+              status={listing.status}
+              allowExchange={listing.allowExchange}
+            />
 
             {/* BẢNG THÔNG SỐ KỸ THUẬT (specsJson) */}
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
                   <h2 className="text-base font-extrabold text-slate-900">
-                    ⚙️ Bảng thông số kỹ thuật chuẩn hoá
+                    ⚙️ Bảng thông số kỹ thuật
                   </h2>
-                  <p className="mt-0.5 text-xs text-slate-500">
-                    Dữ liệu trích xuất từ trường cấu trúc{" "}
-                    <code className="font-mono text-indigo-600">specsJson</code>
-                  </p>
                 </div>
                 <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
                   {brandName}
@@ -259,25 +212,12 @@ export default async function ListingDetailPage({
                 {listing.title}
               </h1>
 
-              {/* Khung Giá bán & Trạng thái */}
-              <div className="mt-4 flex flex-wrap items-baseline justify-between gap-3 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/80">
-                <div>
-                  <span className="block text-xs font-medium text-slate-500">
-                    Giá niêm yết
-                  </span>
-                  <PriceText amount={listing.price} size="xl" />
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                  <StatusBadge
-                    status={listing.condition}
-                    entity="condition"
-                    size="md"
-                  />
-                  <span className="text-[11px] text-slate-500">
-                    {listing.pendingPurchaseRequestCount} yêu cầu mua ·{" "}
-                    {listing.pendingExchangeOfferCount} đề nghị đổi
-                  </span>
-                </div>
+              {/* Khung Giá bán */}
+              <div className="mt-4 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/80">
+                <span className="block text-xs font-medium text-slate-500">
+                  Giá niêm yết
+                </span>
+                <PriceText amount={listing.price} size="xl" />
               </div>
 
               {/* Thông tin mong muốn trao đổi (nếu allowExchange = true) */}

@@ -2,7 +2,23 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Button, formatPriceVnd } from "@/components/ui";
+import {
+  Button,
+  Input,
+  Modal,
+  Select,
+  Textarea,
+  formatPriceVnd,
+  type SelectOption,
+} from "@/components/ui";
+
+const REPORT_REASON_OPTIONS: SelectOption[] = [
+  { value: "FRAUD", label: "Dấu hiệu lừa đảo / chiếm đoạt" },
+  { value: "COUNTERFEIT", label: "Hàng giả / hàng nhái không rõ nguồn gốc" },
+  { value: "WRONG_SPECS", label: "Thông số kỹ thuật sai lệch thực tế" },
+  { value: "SPAM", label: "Tin rác / trùng lặp nhiều lần" },
+  { value: "OTHER", label: "Lý do vi phạm khác" },
+];
 
 export interface ListingActionSlotsProps {
   listingId: string;
@@ -19,7 +35,7 @@ type ActiveSlotModal = "purchase" | "exchange" | "report" | null;
 /**
  * ListingActionSlots — 3 Vùng nút bấm (Action Slots) trên trang Chi tiết sản phẩm (/listings/[id]).
  *
- * Thiết kế sẵn điểm gắn kết (Integration Slots) chuẩn xác để:
+ * Thiết kế sẵn điểm gắn kết (Integration Slots) kèm Modal UI Kit chuẩn xác để:
  *  - [SLOT TV5] Gắn chức năng "Gửi yêu cầu mua" (PurchaseRequest -> POST /api/purchase-requests)
  *  - [SLOT TV7] Gắn chức năng "Đề nghị trao đổi thiết bị" (ExchangeOffer -> POST /api/exchange-offers)
  *  - [SLOT TV8] Gắn chức năng "Báo cáo tin vi phạm" (Report -> POST /api/reports)
@@ -36,6 +52,11 @@ export function ListingActionSlots({
   sellerName,
 }: ListingActionSlotsProps) {
   const [activeSlot, setActiveSlot] = useState<ActiveSlotModal>(null);
+  const [offeredPriceInput, setOfferedPriceInput] = useState<string>(
+    String(price),
+  );
+  const [cashTopUpInput, setCashTopUpInput] = useState<string>("0");
+  const [reportReason, setReportReason] = useState<string>("FRAUD");
 
   return (
     <div className="space-y-4">
@@ -44,9 +65,6 @@ export function ListingActionSlots({
         <div className="mb-3 flex items-center justify-between">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
             Phương thức giao dịch khả dụng
-          </span>
-          <span className="text-[11px] font-medium text-slate-500">
-            Mã tin: <code className="font-mono text-slate-700">{listingId}</code>
           </span>
         </div>
 
@@ -65,9 +83,6 @@ export function ListingActionSlots({
                 <span className="text-xs font-bold text-indigo-950">
                   🛒 Mua trực tiếp
                 </span>
-                <span className="rounded bg-indigo-50 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700">
-                  Slot TV5
-                </span>
               </div>
               <p className="mt-1 text-[11px] text-slate-600">
                 Đề xuất giá mua hoặc đồng ý mức giá niêm yết{" "}
@@ -80,11 +95,7 @@ export function ListingActionSlots({
               size="md"
               fullWidth
               disabled={!isAvailableForDeal}
-              onClick={() =>
-                setActiveSlot((prev) =>
-                  prev === "purchase" ? null : "purchase",
-                )
-              }
+              onClick={() => setActiveSlot("purchase")}
               className="mt-3"
             >
               <span>Gửi yêu cầu mua</span>
@@ -109,9 +120,6 @@ export function ListingActionSlots({
                 <span className="text-xs font-bold text-violet-950">
                   🔄 Đổi máy (Trade-in)
                 </span>
-                <span className="rounded bg-violet-50 px-1.5 py-0.5 text-[10px] font-semibold text-violet-700">
-                  Slot TV7
-                </span>
               </div>
               <p className="mt-1 text-[11px] text-slate-600">
                 {allowExchange
@@ -126,11 +134,7 @@ export function ListingActionSlots({
               size="md"
               fullWidth
               disabled={!isAvailableForDeal || !allowExchange}
-              onClick={() =>
-                setActiveSlot((prev) =>
-                  prev === "exchange" ? null : "exchange",
-                )
-              }
+              onClick={() => setActiveSlot("exchange")}
               className="mt-3"
             >
               <span>Đề nghị trao đổi thiết bị</span>
@@ -164,9 +168,7 @@ export function ListingActionSlots({
 
         <button
           type="button"
-          onClick={() =>
-            setActiveSlot((prev) => (prev === "report" ? null : "report"))
-          }
+          onClick={() => setActiveSlot("report")}
           className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50/70 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100"
         >
           <span aria-hidden>🚩</span>
@@ -177,113 +179,194 @@ export function ListingActionSlots({
         </button>
       </div>
 
-      {/* Khung hiển thị chi tiết Slot khi người dùng bấm thử trên giao diện */}
-      {activeSlot === "purchase" && (
-        <div className="rounded-2xl border border-indigo-200 bg-indigo-50/60 p-4 text-xs text-slate-700">
-          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-indigo-950">
-              🛒 [Action Slot TV5] Khung Gửi Yêu Cầu Mua Hàng (PurchaseRequest)
-            </h4>
-            <button
-              type="button"
+      {/* ====================================================================
+       * MODAL 1 — TV5: Khung Gửi Yêu Cầu Mua (PurchaseRequest)
+       * ==================================================================== */}
+      <Modal
+        open={activeSlot === "purchase"}
+        onClose={() => setActiveSlot(null)}
+        title="🛒 Gửi yêu cầu mua thiết bị (Slot TV5)"
+        description={`Thiết bị: ${listingTitle} · Người bán: ${sellerName}`}
+        size="md"
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              size="md"
               onClick={() => setActiveSlot(null)}
-              className="text-slate-500 hover:text-slate-800"
             >
-              Đóng ✕
-            </button>
-          </div>
-          <p className="mt-1.5">
-            Thiết bị: <strong>{listingTitle}</strong> · Người bán:{" "}
-            <strong>{sellerName}</strong>
-          </p>
-          <p className="mt-1 text-slate-600">
-            Thành viên 5 sẽ gắn form nhập{" "}
-            <code className="font-mono text-indigo-700">offeredPrice</code> (VND)
-            và <code className="font-mono text-indigo-700">message</code> gửi
-            tới <code className="font-mono">POST /api/purchase-requests</code>.
-          </p>
-          <div className="mt-3 flex items-center gap-3">
+              Đóng
+            </Button>
             <Link
               href="/buyer/requests"
-              className="rounded-lg bg-indigo-600 px-3 py-1.5 font-semibold text-white hover:bg-indigo-500"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-indigo-500"
             >
-              Mở trang Yêu cầu mua của TV5 →
+              Đi tới phân hệ Yêu cầu mua (TV5) →
             </Link>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="rounded-xl border border-indigo-100 bg-indigo-50/70 p-3 text-xs text-indigo-900">
+            <strong>Điểm tích hợp TV5:</strong> Gọi API{" "}
+            <code className="font-mono font-bold">
+              POST /api/purchase-requests
+            </code>{" "}
+            với <code className="font-mono">listingId=&quot;{listingId}&quot;</code>.
           </div>
-        </div>
-      )}
 
-      {activeSlot === "exchange" && (
-        <div className="rounded-2xl border border-violet-200 bg-violet-50/60 p-4 text-xs text-slate-700">
-          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-violet-950">
-              🔄 [Action Slot TV7] Khung Đề Nghị Trao Đổi Thiết Bị (ExchangeOffer)
-            </h4>
-            <button
-              type="button"
+          <Input
+            label="Giá đề xuất mua (VND)"
+            name="offeredPrice"
+            type="number"
+            min={1000}
+            value={offeredPriceInput}
+            onChange={(e) => setOfferedPriceInput(e.target.value)}
+            rightAddon="₫"
+            helperText={`Giá niêm yết hiện tại: ${formatPriceVnd(price)}`}
+            required
+          />
+
+          <Textarea
+            label="Lời nhắn gửi người bán"
+            name="message"
+            rows={3}
+            placeholder="Ví dụ: Mình ở Bách Khoa Hà Nội, có thể qua xem và kiểm tra máy trực tiếp chiều nay..."
+            helperText="Nhập thời gian, địa điểm hoặc yêu cầu kiểm tra thiết bị."
+            required
+          />
+        </div>
+      </Modal>
+
+      {/* ====================================================================
+       * MODAL 2 — TV7: Khung Đề Nghị Trao Đổi Thiết Bị (ExchangeOffer)
+       * ==================================================================== */}
+      <Modal
+        open={activeSlot === "exchange"}
+        onClose={() => setActiveSlot(null)}
+        title="🔄 Đề nghị trao đổi thiết bị (Slot TV7)"
+        description={`Đổi lấy máy mục tiêu (X): ${listingTitle}`}
+        size="md"
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              size="md"
               onClick={() => setActiveSlot(null)}
-              className="text-slate-500 hover:text-slate-800"
             >
-              Đóng ✕
-            </button>
-          </div>
-          <p className="mt-1.5">
-            Thiết bị mục tiêu (X): <strong>{listingTitle}</strong>
-          </p>
-          <p className="mt-1 text-slate-600">
-            Thành viên 7 sẽ gắn bộ chọn thiết bị Y của người đề nghị (
-            <code className="font-mono text-violet-700">offeredListingId</code>
-            ), số tiền bù thêm (
-            <code className="font-mono text-violet-700">cashTopUp</code>) và lời
-            nhắn gửi tới{" "}
-            <code className="font-mono">POST /api/exchange-offers</code>.
-          </p>
-          <div className="mt-3 flex items-center gap-3">
+              Đóng
+            </Button>
             <Link
               href="/exchanges"
-              className="rounded-lg bg-violet-600 px-3 py-1.5 font-semibold text-white hover:bg-violet-500"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-violet-500"
             >
-              Mở trang Đề nghị trao đổi của TV7 →
+              Đi tới phân hệ Trao đổi (TV7) →
             </Link>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="rounded-xl border border-violet-100 bg-violet-50/70 p-3 text-xs text-violet-900">
+            <strong>Điểm tích hợp TV7:</strong> Gọi API{" "}
+            <code className="font-mono font-bold">
+              POST /api/exchange-offers
+            </code>{" "}
+            với{" "}
+            <code className="font-mono">
+              targetListingId=&quot;{listingId}&quot;
+            </code>
+            .
           </div>
-        </div>
-      )}
 
-      {activeSlot === "report" && (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50/60 p-4 text-xs text-slate-700">
-          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-rose-950">
-              🚩 [Action Slot TV8] Khung Báo Cáo Tin Vi Phạm (Report)
-            </h4>
-            <button
-              type="button"
+          <Select
+            label="Chọn thiết bị của bạn đem ra đổi (Thiết bị Y)"
+            name="offeredListingId"
+            placeholder="-- Chọn 1 thiết bị đang ACTIVE của bạn --"
+            options={[
+              {
+                value: "sample-offered-listing",
+                label: "Thiết bị đang bán của bạn (TV7 sẽ nạp từ DB)",
+              },
+            ]}
+            helperText="Chỉ các tin đăng ở trạng thái ACTIVE của bạn mới được đem ra trao đổi."
+            required
+          />
+
+          <Input
+            label="Số tiền bù trừ (cashTopUp — VND)"
+            name="cashTopUp"
+            type="number"
+            value={cashTopUpInput}
+            onChange={(e) => setCashTopUpInput(e.target.value)}
+            rightAddon="₫"
+            helperText="Số dương (+): bạn bù thêm tiền · Số âm (-): bạn muốn nhận bù · 0: đổi ngang."
+          />
+
+          <Textarea
+            label="Ghi chú tình trạng & đề xuất giao lưu"
+            name="message"
+            rows={3}
+            placeholder="Ví dụ: Máy mình fullbox còn bảo hành, bù thêm bạn 2.500.000đ..."
+            required
+          />
+        </div>
+      </Modal>
+
+      {/* ====================================================================
+       * MODAL 3 — TV8: Khung Báo Cáo Tin Vi Phạm (Report)
+       * ==================================================================== */}
+      <Modal
+        open={activeSlot === "report"}
+        onClose={() => setActiveSlot(null)}
+        title="🚩 Báo cáo tin đăng vi phạm (Slot TV8)"
+        description={`Báo cáo thiết bị: ${listingTitle} (Mã tin: ${listingId})`}
+        size="md"
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              size="md"
               onClick={() => setActiveSlot(null)}
-              className="text-slate-500 hover:text-slate-800"
             >
-              Đóng ✕
-            </button>
-          </div>
-          <p className="mt-1.5">
-            Báo cáo tin đăng: <strong>{listingTitle}</strong> (ID:{" "}
-            <code className="font-mono">{listingId}</code>)
-          </p>
-          <p className="mt-1 text-slate-600">
-            Thành viên 8 sẽ gắn form chọn lý do vi phạm (
-            <code className="font-mono text-rose-700">reason</code>) và mô tả
-            chi tiết (
-            <code className="font-mono text-rose-700">description</code>) gửi
-            tới <code className="font-mono">POST /api/reports</code>.
-          </p>
-          <div className="mt-3 flex items-center gap-3">
+              Huỷ
+            </Button>
             <Link
               href="/admin"
-              className="rounded-lg bg-rose-600 px-3 py-1.5 font-semibold text-white hover:bg-rose-500"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-rose-500"
             >
-              Mở trang Quản trị &amp; Báo cáo của TV8 →
+              Đi tới phân hệ Báo cáo &amp; Admin (TV8) →
             </Link>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="rounded-xl border border-rose-100 bg-rose-50/70 p-3 text-xs text-rose-900">
+            <strong>Điểm tích hợp TV8:</strong> Gọi API{" "}
+            <code className="font-mono font-bold">POST /api/reports</code> với{" "}
+            <code className="font-mono">
+              targetListingId=&quot;{listingId}&quot;
+            </code>
+            .
           </div>
+
+          <Select
+            label="Lý do báo cáo vi phạm"
+            name="reason"
+            value={reportReason}
+            onChange={(e) => setReportReason(e.target.value)}
+            options={REPORT_REASON_OPTIONS}
+            required
+          />
+
+          <Textarea
+            label="Mô tả bằng chứng chi tiết"
+            name="description"
+            rows={3}
+            placeholder="Mô tả rõ dấu hiệu vi phạm (ảnh không đúng thực tế, thông số sai lệch, nghi ngờ lừa đảo...)"
+            required
+          />
         </div>
-      )}
+      </Modal>
     </div>
   );
 }
