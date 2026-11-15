@@ -2,7 +2,7 @@
 
 **Dự án:** Electronics Trading & Exchange Marketplace — Nhóm 5, IT3180
 **Người phụ trách:** TV5 — Workflow Analyst luồng Mua & Buyer Request
-**Phiên bản:** 1.0 — Sprint 1
+**Phiên bản:** 1.1 — Sprint 1
 
 ## 1. Mục tiêu và phạm vi
 
@@ -24,10 +24,11 @@ Chức năng người bán chấp nhận hoặc từ chối yêu cầu, tạo gi
 và xác nhận hoàn tất thuộc phân hệ giao dịch của TV6.
 
 Trong Sprint 1, TV5 bàn giao tài liệu đặc tả thuộc task 1.10, gồm State Machine
-Diagram, Sequence Diagram và năm quy tắc bất biến của luồng yêu cầu mua.
-Service, API, giao diện và test tự động không thuộc phạm vi bàn giao Sprint 1
-theo thông báo của nhóm trưởng. Phần phản hồi của người bán trong sơ đồ là
-điểm phối hợp với TV6, được mô tả để thể hiện đầy đủ luồng nghiệp vụ dự kiến.
+Diagram, Sequence Diagram và năm quy tắc bất biến của luồng yêu cầu mua,
+kèm khung service validation và unit test quy tắc mua hàng theo xác nhận
+của nhóm trưởng. API, truy vấn/ghi DB và giao diện thuộc Sprint 2.
+Phần phản hồi của người bán trong sơ đồ là điểm phối hợp với TV6,
+được mô tả để thể hiện đầy đủ luồng nghiệp vụ dự kiến.
 
 ## 2. Actor liên quan
 
@@ -198,7 +199,7 @@ Nếu người mua chưa xác thực, không được thực hiện thao tác gh
 ### INV-PUR-04 — Giá đề xuất không âm
 
 - **Điều kiện:** `offeredPrice` là số nguyên, đơn vị VND và
-  `offeredPrice >= 0`, phù hợp kiểu `Int` trong schema.
+  `0 <= offeredPrice <= 2147483647`, phù hợp giới hạn kiểu `Int` của Prisma.
 - **Giá trị dương:** thể hiện mức giá người mua đề xuất cho người bán.
 - **Giá trị bằng 0:** thể hiện đồng ý mua đúng giá niêm yết của tin đăng,
   không có nghĩa là nhận thiết bị miễn phí.
@@ -220,14 +221,15 @@ Nếu người mua chưa xác thực, không được thực hiện thao tác gh
 - **Ví dụ:** nếu người bán đã chấp nhận trước khi người mua xác nhận hủy,
   yêu cầu vẫn giữ `ACCEPTED`; việc hủy giao dịch sau đó thuộc TV6.
 
-Các helper trên đã có tại `src/lib/listing-state.ts`. Khi triển khai sau này,
-giá trị trạng thái phải lấy từ `src/lib/constants.ts` thay vì định nghĩa lại.
+Khung service tại `src/features/purchase/service.ts` sử dụng các helper tại
+`src/lib/listing-state.ts` và trạng thái từ `src/lib/constants.ts`.
 
 ## 6. Tiêu chí chấp nhận và kịch bản kiểm chứng
 
-Các tình huống dưới đây là tiêu chí kiểm chứng cho giai đoạn triển khai sau.
-Đây là kịch bản được đặc tả trong tài liệu, không phải báo cáo kết quả chạy
-test hoặc yêu cầu bàn giao test tự động trong Sprint 1.
+Các tình huống dưới đây mô tả kết quả nghiệp vụ khi triển khai đầy đủ.
+Trong Sprint 1, `tests/purchase.test.ts` kiểm thử riêng điều kiện gửi/hủy bằng
+dữ liệu giả, không tạo hay cập nhật bản ghi. Các tình huống xác thực,
+ghi DB, gửi đồng thời và phối hợp TV6 cần kiểm thử tích hợp ở Sprint 2.
 
 | Mã | Tình huống | Kết quả mong đợi | Quy tắc |
 |---|---|---|---|
@@ -251,23 +253,40 @@ test hoặc yêu cầu bàn giao test tự động trong Sprint 1.
 
 | Nội dung | Nguồn tham chiếu |
 |---|---|
-| Nhiệm vụ tài liệu Sprint 1 của TV5 | `MEMBER-GUIDEBOOK.md`, Phần III — Thành viên 5; task 1.10 trong `agileplan.tsv` |
+| Nhiệm vụ Sprint 1 của TV5 | Bảng đầu ra Sprint 1 trong `MEMBER-GUIDEBOOK.md`; task 1.10 trong `agileplan.tsv`; xác nhận bổ sung validation/test của nhóm trưởng |
 | Trạng thái và điều kiện chuyển trạng thái | `AGENTS.md`, mục 6; `src/lib/constants.ts`; `src/lib/listing-state.ts` |
 | Dữ liệu `PurchaseRequest`, `Listing`, `Transaction` | `prisma/schema.prisma`; `docs/diagrams/erd.md` |
 | Phạm vi gửi và hủy yêu cầu mua | `src/features/purchase/README.md` |
 | Phạm vi phản hồi của người bán và giao dịch | `src/features/transaction/README.md` |
-| Vùng triển khai và kiểm thử dự kiến ở sprint sau | `src/features/purchase/**`; `src/app/api/purchase-requests/**`; `src/app/buyer/requests/**`; `tests/purchase.test.ts` — không thuộc đầu ra Sprint 1 |
+| Khung nghiệp vụ và unit test Sprint 1 | `src/features/purchase/service.ts`; `src/features/purchase/types.ts`; `tests/purchase.test.ts` |
+| API và giao diện Sprint 2 | `src/app/api/purchase-requests/route.ts`; `src/app/api/purchase-requests/[id]/cancel/**`; `src/app/buyer/requests/**` |
 
 ## 8. Phạm vi bàn giao Sprint 1
 
-| Đầu ra | Vị trí trong tài liệu |
+| Đầu ra | Vị trí |
 |---|---|
 | State Machine Diagram bằng Mermaid `stateDiagram-v2` | Mục 3, kèm ý nghĩa trạng thái và bảng chuyển trạng thái |
 | Sequence Diagram bằng Mermaid `sequenceDiagram` | Mục 4, gồm gửi yêu cầu, hủy hoặc người bán phản hồi và các nhánh lỗi |
 | Đặc tả chi tiết năm quy tắc bất biến | Mục 5, từ INV-PUR-01 đến INV-PUR-05 |
 | Tiêu chí kiểm chứng bổ trợ | Mục 6, gồm 15 kịch bản nghiệp vụ |
+| Khung kiểm tra điều kiện gửi/hủy yêu cầu | `src/features/purchase/service.ts`, kiểu dữ liệu tại `types.ts` |
+| Unit test các quy tắc mua hàng | `tests/purchase.test.ts` |
 
-File bàn giao: `docs/srs/module-tv5-purchase.md`. Tài liệu được commit trên
-nhánh riêng `feat/tv5-purchase` để nhóm review. Theo thông báo mới của nhóm
-trưởng, Pull Request tài liệu gửi vào `main`; chỉ đưa file tài liệu này vào
-PR Sprint 1. Code, API, giao diện và test tự động dành cho giai đoạn sau.
+Các file bàn giao được commit trên nhánh riêng `feat/tv5-purchase`,
+Pull Request gửi vào `main` để nhóm review.
+
+### 8.1. Cách dùng khung nghiệp vụ và chạy test
+
+- `validatePurchaseRequest({ buyerId, offeredPrice, listing, existingRequests })`:
+  kiểm tra giá, tin tồn tại/đang nhận yêu cầu, không tự mua và không trùng `PENDING`.
+- `validateCancelPurchaseRequest({ buyerId, request })`: kiểm tra yêu cầu tồn tại,
+  đúng người mua và có thể chuyển sang `CANCELLED`.
+- Kết quả hợp lệ: `{ valid: true }`; khi bị từ chối:
+  `{ valid: false, status, error: { code, message } }`.
+- Chạy riêng: `npm test -- tests/purchase.test.ts`.
+- Kiểm tra toàn dự án: `npm run check`.
+
+Service là hàm thuần, không xác thực phiên đăng nhập, không gọi Prisma và không
+tạo/hủy bản ghi. Khi tích hợp Sprint 2, `buyerId` phải lấy từ phiên đăng nhập;
+API phải nạp dữ liệu mới từ DB, kiểm tra điều kiện và ghi có điều kiện trong
+transaction để xử lý gửi trùng hoặc hủy đồng thời với phản hồi của người bán.
