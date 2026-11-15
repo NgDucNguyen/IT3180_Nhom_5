@@ -22,7 +22,7 @@ Mỗi thành viên sẽ đội **2 chiếc mũ**:
 | Thành viên | Mũ 1: Vai trò CNPM (Tài liệu & Quy trình) | Mũ 2: Phân hệ Code trên GitHub (Ai cũng có commit) |
 | :--- | :--- | :--- |
 | **TV 1** | **PM / Scrum Master**<br>Quản lý tiến độ, chia task trên GitHub Projects, ghép slide báo cáo. | **Module Auth & Hồ sơ cá nhân**<br>Đăng ký, Đăng nhập, phân quyền User/Admin (Middleware), xem & sửa Profile. |
-| **TV 2** | **System / DB Architect**<br>Thiết kế kiến trúc, vẽ ERD, chốt Database Schema, quản lý nhánh Git (`main`/`develop`). | **Module Base Setup & Danh mục (Category/Brand)**<br>Dựng khung dự án ban đầu, cấu hình DB + dữ liệu mẫu (Seed), API/UI lấy Category, Brand, xử lý Upload ảnh. |
+| **TV 2** | **System / DB Architect**<br>Thiết kế kiến trúc, vẽ ERD, chốt Database Schema, quản lý nhánh Git (`main'). | **Module Base Setup & Danh mục (Category/Brand)**<br>Dựng khung dự án ban đầu, cấu hình DB + dữ liệu mẫu (Seed), API/UI lấy Category, Brand, xử lý Upload ảnh. |
 | **TV 3** | **BA Lead (Phân tích nghiệp vụ)**<br>Chủ trì cấu trúc tài liệu SRS, tổng hợp Use Case & User Stories. | **Module Đăng tin & Quản lý tin bán (Seller Listing)**<br>Tạo tin đăng mới, chọn thông số/tình trạng, bật/tắt nhận trao đổi, trang "Tin đăng của tôi" (sửa, ẩn, xóa tin). |
 | **TV 4** | **UI/UX Lead**<br>Thiết kế Wireframe, tạo bộ khung giao diện (Navbar, Footer, Theme màu sắc) thống nhất. | **Module Khám phá, Tìm kiếm & Lọc (Discovery)**<br>Trang chủ, danh sách sản phẩm, thanh tìm kiếm từ khóa, bộ lọc (Danh mục, Hãng, Tình trạng, Giá), Trang chi tiết tin đăng. |
 | **TV 5** | **Workflow Analyst (Luồng Mua)**<br>Vẽ sơ đồ trạng thái (State Machine) và Sequence Diagram cho luồng Mua bán. | **Module Yêu cầu mua hàng – Phía Người mua**<br>Nút gửi `PurchaseRequest`, kiểm tra điều kiện hợp lệ (chặn tự mua của mình, chặn gửi trùng), huỷ yêu cầu, trang "Yêu cầu đã gửi". |
@@ -55,8 +55,8 @@ Giảng viên chấm môn CNPM thường nhìn vào **GitHub Insights (Contribut
 * Cả nhóm nhìn vào `agileplan.tsv`, tạo các **Issues** tương ứng trên **GitHub Projects** (dạng bảng Kanban: `To Do` → `In Progress` → `In Review` → `Done`) và gán tên (`Assignee`) cho từng người trong 8 thành viên.
 
 ### Bước 2: Tạo nhánh riêng (Branching) – Không ai code trực tiếp trên `main`
-* Quy ước 2 nhánh chính: `main` (code ổn định để demo cho giảng viên) và `develop` (nhánh ghép code của nhóm).
-* Khi bắt đầu làm task, mỗi người kéo nhánh `develop` về và tạo nhánh riêng theo tên mình/tính năng:
+* Quy ước 2 nhánh chính: `main` 
+* Khi bắt đầu làm task, mỗi người kéo nhánh `main` về và tạo nhánh riêng theo tên mình/tính năng:
   * Ví dụ: `git checkout -b feat/tv1-auth` hoặc `git checkout -b feat/tv7-exchange`.
 
 ### Bước 3: Dùng AI Agent để Code + Viết Doc + Viết Test
@@ -67,8 +67,8 @@ Giảng viên chấm môn CNPM thường nhìn vào **GitHub Insights (Contribut
 * **Quy tắc Commit:** Chia nhỏ thành nhiều lần commit có ý nghĩa (ví dụ: 1 commit cho API, 1 commit cho giao diện, 1 commit cho tài liệu/test) để biểu đồ đóng góp trên GitHub của cả 8 người đều đẹp và đều đặn.
 
 ### Bước 4: Tạo Pull Request (PR) & Review chéo
-* Làm xong, thành viên push nhánh của mình lên GitHub và tạo **Pull Request (PR)** gộp vào nhánh `develop`.
+* Làm xong, thành viên push nhánh của mình lên GitHub và tạo **Pull Request (PR)** gộp vào nhánh `main`.
 * Quy định: **Ít nhất 1 người khác trong nhóm (hoặc PM/Tech Lead) phải vào bấm Review & Approve** trước khi bấm **Merge** (nên chọn *Create a merge commit* thay vì *Squash* nếu muốn giữ nguyên số lượng commit lẻ của từng thành viên trên lịch sử Git).
 
 ### Bước 5: Cuối Sprint – Tích hợp & Demo (Sprint Review)
-* 2 ngày cuối mỗi Sprint, cả nhóm ngưng thêm tính năng mới, cùng chạy thử trên nhánh `develop`, sửa các lỗi lệch dữ liệu giữa các module, sau đó gộp sang `main` để chuẩn bị Demo.
+* 2 ngày cuối mỗi Sprint, cả nhóm ngưng thêm tính năng mới, cùng chạy thử trên nhánh `main`, sửa các lỗi lệch dữ liệu giữa các module.
