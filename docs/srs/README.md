@@ -53,7 +53,7 @@ docs/srs/
 |---|---|---|
 | [overview.md](overview.md) | TV1 soạn, TV3 tổng hợp | Tổng quan actor, phạm vi, Use Case và quy tắc chung |
 | [module-tv1-auth.md](module-tv1-auth.md) | TV1 | Đặc tả Auth Sprint 1 |
-| [module-tv2-catalog.md](module-tv2-catalog.md) | TV2 | ✅ Hoàn thành (Sprint 1) |
+| [module-tv2-catalog.md](module-tv2-catalog.md) | TV2 | Hoàn thành (Sprint 1) |
 | [module-tv3-listing.md](module-tv3-listing.md) | TV3 | UC-LST-01–04, User Stories, API, ràng buộc và truy vết kiểm thử |
 | [module-tv4-discovery.md](module-tv4-discovery.md), [tv4-ui-and-discovery.md](tv4-ui-and-discovery.md) | TV4 | Đặc tả Discovery và UI dùng chung |
 | `module-tv5-purchase.md` đến `module-tv8-admin-report.md`, `test-plan.md` | TV5–TV8 | Owner bổ sung trong phạm vi riêng |
