@@ -23,8 +23,6 @@ Thanh toán, vận chuyển, gặp mặt nằm **ngoài hệ thống** (Out of S
 | UC-TXN-04 | Xác nhận giao dịch | Là buyer hoặc seller; Transaction `IN_PROGRESS` | Bật cờ của mình; đủ 2 cờ thì `COMPLETED` |
 | UC-TXN-05 | Hủy giao dịch | Là buyer hoặc seller; Transaction `IN_PROGRESS` | `CANCELLED`, listing về `ACTIVE` |
 
-(Mỗi use case thêm 1 đoạn **luồng chính** và **luồng ngoại lệ** — xem mục 5.)
-
 ## 4. Quy tắc nghiệp vụ
 1. Chỉ chủ listing mới được accept/reject (`403 FORBIDDEN` nếu sai người).
 2. Chỉ request `PENDING` mới được accept/reject (`409 CONFLICT` nếu khác).
@@ -32,7 +30,7 @@ Thanh toán, vận chuyển, gặp mặt nằm **ngoài hệ thống** (Out of S
 4. Khi accept, mọi request `PENDING` khác trên cùng listing tự động `REJECTED`.
 5. Mỗi `PurchaseRequest` sinh tối đa 1 `Transaction` (`UNIQUE(purchaseRequestId)`).
 6. Chỉ `COMPLETED` khi `buyerConfirmed && sellerConfirmed`.
-7. `COMPLETED` → listing `SOLD`, set `completedAt`. `CANCELLED` → listing về `ACTIVE`.
+7. `COMPLETED` → listing `SOLD` (giao dịch mua; giao dịch trao đổi sẽ là `EXCHANGED`, TV6 mở rộng ở Sprint 3), set `completedAt`. `CANCELLED` → listing về `ACTIVE`.
 8. `COMPLETED` và `CANCELLED` là trạng thái cuối.
 9. Chỉ người thuộc giao dịch (buyer hoặc seller) mới được confirm/cancel.
 
@@ -115,13 +113,14 @@ sequenceDiagram
 ## 7. Danh sách API
 | Method | Endpoint | Mô tả | Lỗi thường gặp |
 |---|---|---|---|
-| POST | `/api/purchase-requests/[id]/accept` | Chấp nhận | 403, 404, 409 |
-| POST | `/api/purchase-requests/[id]/reject` | Từ chối | 403, 404, 409 |
+| POST | `/api/purchase-requests/[id]/accept` | Chấp nhận | 401, 403, 404, 409 |
+| POST | `/api/purchase-requests/[id]/reject` | Từ chối | 401, 403, 404, 409 |
 | GET | `/api/transactions` | Danh sách giao dịch | 401 |
-| PATCH | `/api/transactions/[id]/confirm` | Xác nhận | 403, 404, 409 |
-| PATCH | `/api/transactions/[id]/cancel` | Hủy | 403, 404, 409 |
+| PATCH | `/api/transactions/[id]/confirm` | Xác nhận | 401, 403, 404, 409 |
+| PATCH | `/api/transactions/[id]/cancel` | Hủy | 401, 403, 404, 409 |
 
 ## 8. Phụ thuộc module khác
 - TV5 tạo `PurchaseRequest` (có `offeredPrice`, `0` nghĩa là giá niêm yết).
 - TV7 tạo Transaction `EXCHANGE`; TV6 mở rộng confirm/cancel ở Sprint 3.
 - TV3: listing `IN_TRANSACTION` không được sửa (`isListingEditable`).
+- TV1: cung cấp người dùng đang đăng nhập (từ phiên) để xác định người bán / người mua.
