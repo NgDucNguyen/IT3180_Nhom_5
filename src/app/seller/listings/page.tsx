@@ -1,42 +1,32 @@
-import { ModulePlaceholder } from "@/components/ui";
-import { LISTING_STATUS } from "@/lib/constants";
+import { Container } from "@/components/layout";
+import { SellerListings } from "@/features/listing/components/SellerListings";
+import { requireListingPageUser } from "@/features/listing/page-auth";
+import { getSellerListings } from "@/features/listing/service";
+import { isListingStatus } from "@/lib/constants";
 
-/**
- * Trang khung Quản lý tin đăng của tôi — Bàn giao cho TV3 (BA Lead / Module Seller Listing).
- */
-export default function SellerListingsPage() {
+export const dynamic = "force-dynamic";
+
+export default async function SellerListingsPage({ searchParams }: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const user = await requireListingPageUser();
+  const rawParams = await searchParams;
+  const params = new URLSearchParams();
+  for (const key of ["page", "status"] as const) {
+    const value = rawParams[key];
+    if (typeof value === "string") params.set(key, value);
+  }
+  const statusValue = params.get("status");
+  const status = statusValue && isListingStatus(statusValue) ? statusValue : undefined;
+  if (!status) params.delete("status");
+  const result = await getSellerListings(user.id, params);
   return (
-    <ModulePlaceholder
-      memberId="TV3"
-      memberRole="BA Lead"
-      moduleTitle="Quản lý Tin đăng của tôi"
-      routePath="/seller/listings"
-      featureDir="src/features/listing/** · src/app/seller/listings/** · src/app/my-listings/**"
-      description="Trang khung dành cho Thành viên 3 xây dựng danh sách quản lý các thiết bị người bán đã đăng: xem trạng thái duyệt, chỉnh sửa thông tin, ẩn/bỏ ẩn tin đăng."
-      checklist={[
-        "Hiển thị danh sách tin đăng của người dùng hiện tại theo từng trạng thái.",
-        "Chỉnh sửa nội dung tin đăng (nếu tin đang ACTIVE sửa xong phải đưa về PENDING duyệt lại).",
-        "Chặn chỉnh sửa khi tin đang ở trạng thái IN_TRANSACTION, SOLD hoặc EXCHANGED.",
-        "Chức năng Ẩn tin (ACTIVE -> HIDDEN) và Bỏ ẩn (HIDDEN -> ACTIVE).",
-      ]}
-      sampleEndpoints={[
-        "GET    /api/listings?mine=true",
-        "PATCH  /api/listings/[id]",
-        "PATCH  /api/listings/[id]/hide",
-        "DELETE /api/listings/[id]",
-      ]}
-      sampleStatuses={{
-        entity: "listing",
-        values: [
-          LISTING_STATUS.PENDING,
-          LISTING_STATUS.ACTIVE,
-          LISTING_STATUS.IN_TRANSACTION,
-          LISTING_STATUS.SOLD,
-          LISTING_STATUS.EXCHANGED,
-          LISTING_STATUS.HIDDEN,
-          LISTING_STATUS.REJECTED,
-        ],
-      }}
-    />
+    <main className="py-8 sm:py-12">
+      <Container>
+        <div className="mx-auto max-w-5xl">
+          <SellerListings result={result} status={status} created={rawParams.created === "1"} />
+        </div>
+      </Container>
+    </main>
   );
 }
