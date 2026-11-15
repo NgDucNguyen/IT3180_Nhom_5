@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Container } from "./Container";
+import { EladeLogo } from "./EladeLogo";
 
 export interface NavItem {
   label: string;
@@ -45,19 +46,12 @@ export function Navbar() {
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-900 text-slate-100 shadow-md">
       <Container>
         <div className="flex h-16 items-center justify-between gap-4">
-          {/* Logo ElectroSwap */}
+          {/* Logo Elade (Electronic + Trade) */}
           <Link
             href="/"
-            className="group flex shrink-0 items-center gap-2.5 focus:outline-none"
+            className="group flex shrink-0 items-center focus:outline-none"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-sm transition-transform group-hover:scale-105">
-              <span className="text-lg font-extrabold tracking-tighter" aria-hidden>
-                ⚡
-              </span>
-            </div>
-            <span className="text-lg font-bold tracking-tight text-white">
-              El<span className="text-indigo-400">ade</span>
-            </span>
+            <EladeLogo size="md" />
           </Link>
 
           {/* Cụm nút bên phải: Đăng ký (trái) + Đăng nhập (phải) */}

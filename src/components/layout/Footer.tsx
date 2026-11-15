@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Container } from "./Container";
+import { EladeLogo } from "./EladeLogo";
 
 /**
  * Footer dùng chung toàn ứng dụng.
@@ -12,16 +13,7 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-2">
           {/* Cột 1: Thương hiệu & Mô tả dự án */}
           <div className="max-w-md">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">
-                <span className="text-sm font-bold" aria-hidden>
-                  ⚡
-                </span>
-              </div>
-              <span className="text-base font-bold text-white">
-                El<span className="text-indigo-400">ade</span> C2C
-              </span>
-            </div>
+            <EladeLogo size="sm" suffix="C2C" />
             <p className="mt-3 text-xs leading-relaxed text-slate-400">
               Nền tảng thương mại điện tử C2C chuyên biệt cho phép người dùng đăng
               tin mua bán và trao đổi thiết bị điện tử mới hoặc đã qua sử dụng.

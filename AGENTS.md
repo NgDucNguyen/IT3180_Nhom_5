@@ -62,14 +62,14 @@ npm run db:reset       # xoá DB + tạo lại + seed
 
 | TV | Mũ 1 (CNPM) | Mũ 2 (Module code) | **Vùng được sửa (write)** |
 |---|---|---|---|
-| **TV1** | PM / Scrum Master | Auth & Hồ sơ | `src/features/auth/**`, `src/app/api/auth/**`, `src/app/(auth)/**`, `src/app/profile/**`, `src/lib/auth.ts`, `src/middleware.ts` |
-| **TV2** | System / DB Architect | Base Setup & Danh mục | `prisma/**`, `src/lib/prisma.ts`, `src/lib/constants.ts`, `src/lib/api-response.ts`, `src/lib/listing-state.ts`, `src/features/catalog/**`, `src/app/api/categories/**`, `src/app/api/brands/**`, `docs/diagrams/**`, `AGENTS.md` |
-| **TV3** | BA Lead | Đăng tin & Quản lý tin bán | `src/features/listing/**`, `src/app/api/listings/**`, `src/app/my-listings/**`, `docs/srs/**` |
-| **TV4** | UI/UX Lead | Khám phá, Tìm kiếm & Lọc | `src/features/discovery/**`, `src/components/layout/**`, `src/components/ui/**`, `src/app/page.tsx`, `src/app/listings/**`, `src/app/layout.tsx`, `src/app/globals.css` |
-| **TV5** | Workflow Analyst (Mua) | Yêu cầu mua — phía người mua | `src/features/purchase/**`, `src/app/api/purchase-requests/**`, `src/app/my-requests/**` |
-| **TV6** | Workflow Analyst (Giao dịch) | Xử lý đơn mua & Lịch sử giao dịch | `src/features/transaction/**`, `src/app/api/transactions/**`, `src/app/my-transactions/**`, `src/app/api/purchase-requests/[id]/accept/**`, `src/app/api/purchase-requests/[id]/reject/**` |
-| **TV7** | BA/Designer (Trao đổi) | Đề nghị Trao đổi | `src/features/exchange/**`, `src/app/api/exchange-offers/**`, `src/app/exchange/**` |
-| **TV8** | QA / Test Lead | Báo cáo vi phạm & Admin | `src/features/report/**`, `src/features/admin/**`, `src/app/api/reports/**`, `src/app/api/admin/**`, `src/app/admin/**`, `tests/README.md`, `docs/srs/test-plan.md` |
+| **TV1** | PM / Scrum Master | Auth & Hồ sơ | `src/features/auth/**`, `src/app/api/auth/**`, `src/app/(auth)/**`, `src/app/profile/**`, `src/lib/auth.ts`, `src/middleware.ts`, `docs/srs/module-tv1-auth.md`, `tests/auth.test.ts` |
+| **TV2** | System / DB Architect | Base Setup & Danh mục | `prisma/**`, `src/lib/prisma.ts`, `src/lib/constants.ts`, `src/lib/api-response.ts`, `src/lib/listing-state.ts`, `src/features/catalog/**`, `src/app/api/categories/**`, `src/app/api/brands/**`, `docs/diagrams/**`, `docs/srs/module-tv2-catalog.md`, `tests/listing-state.test.ts`, `tests/api-catalog.test.ts`, `AGENTS.md` |
+| **TV3** | BA Lead | Đăng tin & Quản lý tin bán | `src/features/listing/**`, `src/app/api/listings/**`, `src/app/listings/create/**`, `src/app/seller/listings/**`, `src/app/my-listings/**`, `docs/srs/README.md`, `docs/srs/overview.md`, `docs/srs/module-tv3-listing.md`, `tests/listing.test.ts` |
+| **TV4** | UI/UX Lead | Khám phá, Tìm kiếm & Lọc | `src/features/discovery/**`, `src/components/layout/**`, `src/components/ui/**`, `src/app/page.tsx`, `src/app/listings/page.tsx`, `src/app/listings/loading.tsx`, `src/app/listings/error.tsx`, `src/app/listings/[id]/**`, `src/app/layout.tsx`, `src/app/globals.css`, `docs/srs/module-tv4-discovery.md`, `docs/srs/tv4-ui-and-discovery.md`, `tests/discovery.test.ts` |
+| **TV5** | Workflow Analyst (Mua) | Yêu cầu mua — phía người mua | `src/features/purchase/**`, `src/app/api/purchase-requests/route.ts`, `src/app/api/purchase-requests/[id]/cancel/**`, `src/app/buyer/requests/**`, `src/app/my-requests/**`, `docs/srs/module-tv5-purchase.md`, `tests/purchase.test.ts` |
+| **TV6** | Workflow Analyst (Giao dịch) | Xử lý đơn mua & Lịch sử giao dịch | `src/features/transaction/**`, `src/app/api/transactions/**`, `src/app/transactions/**`, `src/app/my-transactions/**`, `src/app/api/purchase-requests/[id]/accept/**`, `src/app/api/purchase-requests/[id]/reject/**`, `docs/srs/module-tv6-transaction.md`, `tests/transaction.test.ts` |
+| **TV7** | BA/Designer (Trao đổi) | Đề nghị Trao đổi | `src/features/exchange/**`, `src/app/api/exchange-offers/**`, `src/app/exchanges/**`, `src/app/exchange/**`, `docs/srs/module-tv7-exchange.md`, `tests/exchange.test.ts` |
+| **TV8** | QA / Test Lead | Báo cáo vi phạm & Admin | `src/features/report/**`, `src/features/admin/**`, `src/app/api/reports/**`, `src/app/api/admin/**`, `src/app/admin/**`, `tests/README.md`, `tests/report-admin.test.ts`, `docs/srs/test-plan.md`, `docs/srs/module-tv8-admin-report.md` |
 
 **Được ĐỌC (read-only) tất cả các vùng còn lại.** Muốn dùng hàm của người khác →
 import, không copy-paste và không sửa.
@@ -86,6 +86,7 @@ import, không copy-paste và không sửa.
 | `src/app/layout.tsx`, `globals.css` | **TV4** | Không sửa |
 | `src/app/page.tsx` | **TV4** | Không sửa (trang tạm của TV2 sẽ bị thay) |
 | `src/components/ui/**` | **TV4** | Không sửa, chỉ import |
+| `docs/srs/module-tvX-*.md` | **TV1–TV8** | Mỗi TV chỉ tạo/sửa file SRS của module mình; `README.md` và `overview.md` do TV3 chủ trì |
 | `tests/<module>.test.ts` | Người tạo file | Không sửa test của người khác |
 
 ---
@@ -240,13 +241,14 @@ khi đã có yêu cầu `PENDING` trên cùng listing.
 src/
 ├─ app/                    # Next.js App Router (routes + API)
 │  ├─ api/<domain>/        # Route Handlers - chia theo phân vùng ở mục 3
-│  ├─ (auth)/              # TV1
-│  ├─ listings/            # TV4
-│  ├─ my-listings/         # TV3
-│  ├─ my-requests/         # TV5
-│  ├─ my-transactions/     # TV6
-│  ├─ exchange/            # TV7
-│  └─ admin/               # TV8
+│  ├─ (auth)/              # TV1: login, register
+│  ├─ profile/             # TV1: hồ sơ cá nhân
+│  ├─ listings/            # TV4: khám phá & chi tiết (riêng listings/create thuộc TV3)
+│  ├─ seller/listings/     # TV3: quản lý tin bán (kèm my-listings/)
+│  ├─ buyer/requests/      # TV5: yêu cầu mua (kèm my-requests/)
+│  ├─ transactions/        # TV6: đơn bán & lịch sử giao dịch (kèm my-transactions/)
+│  ├─ exchanges/           # TV7: đề nghị trao đổi (kèm exchange/)
+│  └─ admin/               # TV8: quản trị & xử lý báo cáo
 ├─ components/
 │  ├─ layout/              # TV4: Navbar, Footer
 │  └─ ui/                  # TV4: Button, Card, Input… (dùng chung)
