@@ -88,22 +88,70 @@ const USERS = [
     role: "ADMIN",
   },
   {
+    email: "mua@nhom5.vn",
+    fullName: "Phạm Minh Mua",
+    phone: "0900000005",
+    role: "USER",
+  },
+  {
     email: "an@nhom5.vn",
     fullName: "Nguyễn Văn An",
     phone: "0900000002",
-    role: "USER",
+    role: "SELLER",
   },
   {
     email: "binh@nhom5.vn",
     fullName: "Trần Thị Bình",
     phone: "0900000003",
-    role: "USER",
+    role: "SELLER",
   },
   {
     email: "chi@nhom5.vn",
     fullName: "Lê Minh Chi",
     phone: "0900000004",
-    role: "USER",
+    role: "SELLER",
+  },
+];
+
+const SHOPS = [
+  {
+    ownerEmail: "an@nhom5.vn",
+    name: "An Tech Store",
+    slug: "an-tech-store",
+    tagline: "Chuyên Apple, MacBook & iPad nguyên zin — Bảo hành trách nhiệm 1-1",
+    description:
+      "Cửa hàng chuyên thu mua, trao đổi và bán các dòng iPhone, MacBook, iPad, Apple Watch chính hãng VN/A và xách tay tuyển chọn. Kiểm tra máy trực tiếp tại Hà Nội.",
+    city: "Hà Nội",
+    address: "Số 18 Tạ Quang Bửu, Hai Bà Trưng, Hà Nội",
+    contactPhone: "0900000002",
+    bannerTheme: "indigo",
+    isVerified: true,
+  },
+  {
+    ownerEmail: "binh@nhom5.vn",
+    name: "Bình Mobile & Gear",
+    slug: "binh-mobile-gear",
+    tagline: "Flagship Samsung, Dell XPS & phụ kiện sạc cáp GaN chính hãng",
+    description:
+      "Chuyên smartphone Android cao cấp, laptop doanh nhân Dell và phụ kiện công nghệ chất lượng cao. Hỗ trợ test trực tiếp và bao test 7 ngày.",
+    city: "TP. Hồ Chí Minh",
+    address: "268 Lý Thường Kiệt, Quận 10, TP. HCM",
+    contactPhone: "0900000003",
+    bannerTheme: "emerald",
+    isVerified: true,
+  },
+  {
+    ownerEmail: "chi@nhom5.vn",
+    name: "Chi Gaming & Audio Hub",
+    slug: "chi-gaming-audio-hub",
+    tagline: "Laptop Gaming hiệu năng cao, Tai nghe chống ồn Sony & Giao lưu thiết bị",
+    description:
+      "Chuyên giao lưu, trao đổi Laptop Gaming ROG/Legion, Xiaomi flagship và thiết bị âm thanh Sony cao cấp.",
+    city: "Đà Nẵng",
+    address: "54 Nguyễn Lương Bằng, Liên Chiểu, Đà Nẵng",
+    contactPhone: "0900000004",
+    bannerTheme: "rose",
+    isVerified: false,
   },
 ];
 
@@ -413,6 +461,31 @@ async function main() {
   }
   console.log(`   ✓ ${USERS.length} người dùng (mật khẩu: ${DEMO_PASSWORD})`);
 
+  // --- Shops ---
+  for (const shop of SHOPS) {
+    const ownerId = userIdByEmail.get(shop.ownerEmail);
+    if (!ownerId) {
+      throw new Error(`Seed lỗi: thiếu user cho shop ${shop.slug}`);
+    }
+    const shopData = {
+      name: shop.name,
+      slug: shop.slug,
+      tagline: shop.tagline,
+      description: shop.description,
+      city: shop.city,
+      address: shop.address,
+      contactPhone: shop.contactPhone,
+      bannerTheme: shop.bannerTheme,
+      isVerified: shop.isVerified,
+    };
+    await prisma.shop.upsert({
+      where: { ownerId },
+      update: shopData,
+      create: { ownerId, ...shopData },
+    });
+  }
+  console.log(`   ✓ ${SHOPS.length} cửa hàng (Shop)`);
+
   // --- Listings ---
   for (const listing of LISTINGS) {
     const sellerId = userIdByEmail.get(listing.seller);
@@ -446,8 +519,38 @@ async function main() {
   }
   console.log(`   ✓ ${LISTINGS.length} tin đăng`);
 
+  // --- Sample PurchaseRequest & Report (idempotent) ---
+  const buyerId = userIdByEmail.get("mua@nhom5.vn");
+  if (buyerId) {
+    await prisma.purchaseRequest.upsert({
+      where: { id: "pr-demo-1" },
+      update: {},
+      create: {
+        id: "pr-demo-1",
+        listingId: "lst-iphone15pm",
+        buyerId,
+        offeredPrice: 25_000_000,
+        message: "Mình ở Hai Bà Trưng, có thể qua Shop xem và kiểm máy chiều nay ạ.",
+        status: "PENDING",
+      },
+    });
+    await prisma.report.upsert({
+      where: { id: "rep-demo-1" },
+      update: {},
+      create: {
+        id: "rep-demo-1",
+        reporterId: buyerId,
+        listingId: "lst-xiaomi14",
+        reason: "WRONG_SPECS",
+        description: "Kiểm tra lại thông tin dung lượng pin và phụ kiện kèm theo.",
+        status: "PENDING",
+      },
+    });
+  }
+
   const counts = {
     users: await prisma.user.count(),
+    shops: await prisma.shop.count(),
     categories: await prisma.category.count(),
     brands: await prisma.brand.count(),
     listings: await prisma.listing.count(),

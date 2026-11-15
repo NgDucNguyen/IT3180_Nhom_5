@@ -1,40 +1,85 @@
-import { ModulePlaceholder } from "@/components/ui";
-import { EXCHANGE_OFFER_STATUS } from "@/lib/constants";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Container } from "@/components/layout";
+import { Card } from "@/components/ui";
+import { AuthError } from "@/features/auth/errors";
+import { ExchangesWorkspace } from "@/features/exchange/components/ExchangesWorkspace";
+import { listExchangeOffers } from "@/features/exchange/service";
+import { getCurrentUser } from "@/lib/auth";
+import { ROLES } from "@/lib/constants";
+
+export const dynamic = "force-dynamic";
 
 /**
- * Trang khung Đề nghị Trao đổi thiết bị — Bàn giao cho TV7 (BA/Designer - Luồng Trao đổi).
+ * Trang quản lý Đề nghị Trao đổi thiết bị (ExchangeOffer).
  */
-export default function ExchangesPage() {
+export default async function ExchangesPage() {
+  let user;
+  try {
+    user = await getCurrentUser();
+  } catch (error) {
+    if (error instanceof AuthError) redirect("/login");
+    throw error;
+  }
+
+  if (!user) redirect("/login");
+
+  if (user.role === ROLES.ADMIN) {
+    return (
+      <main className="py-10">
+        <Container>
+          <Card className="mx-auto max-w-lg rounded-2xl p-6 text-center">
+            <h1 className="text-lg font-bold text-slate-900">
+              Tài khoản Quản trị viên không tham gia trao đổi
+            </h1>
+            <p className="mt-2 text-sm text-slate-600">
+              Quản trị viên phụ trách kiểm duyệt tin đăng, xử lý báo cáo vi phạm và
+              quản trị hệ thống.
+            </p>
+            <Link
+              href="/admin"
+              className="mt-4 inline-flex rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white"
+            >
+              Về trang Admin →
+            </Link>
+          </Card>
+        </Container>
+      </main>
+    );
+  }
+
+  const offers = await listExchangeOffers(user.id, "all");
+
   return (
-    <ModulePlaceholder
-      memberId="TV7"
-      memberRole="BA / Designer (Luồng Trao đổi)"
-      moduleTitle="Quản lý Đề nghị Trao đổi thiết bị (ExchangeOffer)"
-      routePath="/exchanges"
-      featureDir="src/features/exchange/** · src/app/exchanges/** · src/app/exchange/** · src/app/api/exchange-offers/**"
-      description="Trang khung dành cho Thành viên 7 xây dựng quy trình đổi thiết bị Y của người đề nghị lấy thiết bị X của chủ tin (kèm tiền bù cashTopUp), xử lý chấp nhận/từ chối và khóa đồng thời 2 thiết bị."
-      checklist={[
-        "Hiển thị danh sách Đề nghị trao đổi đã gửi (box=sent) và đã nhận (box=received).",
-        "Kiểm tra ràng buộc: proposerId !== receiverId, cả 2 thiết bị X và Y đều ACTIVE, thiết bị X bật allowExchange = true.",
-        "Khi người nhận Chấp nhận: tạo Transaction(type=EXCHANGE) và khóa đồng thời cả 2 Listing sang IN_TRANSACTION.",
-        "Hỗ trợ từ chối hoặc hủy đề nghị trao đổi khi còn ở trạng thái PENDING.",
-      ]}
-      sampleEndpoints={[
-        "POST  /api/exchange-offers",
-        "GET   /api/exchange-offers?box=sent|received",
-        "PATCH /api/exchange-offers/[id]/accept",
-        "PATCH /api/exchange-offers/[id]/reject",
-        "PATCH /api/exchange-offers/[id]/cancel",
-      ]}
-      sampleStatuses={{
-        entity: "exchangeOffer",
-        values: [
-          EXCHANGE_OFFER_STATUS.PENDING,
-          EXCHANGE_OFFER_STATUS.ACCEPTED,
-          EXCHANGE_OFFER_STATUS.REJECTED,
-          EXCHANGE_OFFER_STATUS.CANCELLED,
-        ],
-      }}
-    />
+    <main className="py-8 sm:py-10">
+      <Container>
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-indigo-600">
+              Trao đổi thiết bị C2C
+            </p>
+            <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900">
+              Đề nghị Trao đổi
+            </h1>
+            <p className="mt-1 text-sm text-slate-600">
+              Đổi trực tiếp 1 thiết bị ACTIVE của Shop bạn lấy thiết bị từ Shop
+              khác kèm tiền bù minh bạch.
+            </p>
+          </div>
+          <Link
+            href="/transactions"
+            className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+          >
+            Xem Giao dịch &amp; Xác nhận 2 chiều →
+          </Link>
+        </div>
+
+        <ExchangesWorkspace
+          currentUserId={user.id}
+          currentUserRole={user.role}
+          initialOffers={offers}
+        />
+      </Container>
+    </main>
   );
 }

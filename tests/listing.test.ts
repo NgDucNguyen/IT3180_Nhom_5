@@ -55,7 +55,7 @@ beforeAll(async () => {
   for (const label of ["owner", "other", "list-owner"]) {
     const user = await prisma.user.create({
       data: { email: `tv3-${label}-${suffix}@example.test`, fullName: `TV3 ${label}`,
-        passwordHash: "fixture-not-used-for-login", role: ROLES.USER, status: USER_STATUS.ACTIVE },
+        passwordHash: "fixture-not-used-for-login", role: ROLES.SELLER, status: USER_STATUS.ACTIVE },
       select: { id: true },
     });
     userIds.push(user.id);

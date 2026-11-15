@@ -39,6 +39,16 @@ export interface DiscoveryCatalogSummary {
   totalExchangeListings: number;
 }
 
+export interface ListingSellerShopBadge {
+  id: string;
+  name: string;
+  slug: string;
+  avatarUrl: string | null;
+  city: string;
+  bannerTheme: string;
+  isVerified: boolean;
+}
+
 export interface DiscoveryListingItem {
   id: string;
   title: string;
@@ -66,6 +76,7 @@ export interface DiscoveryListingItem {
     id: string;
     fullName: string;
     avatarUrl: string | null;
+    shop?: ListingSellerShopBadge | null;
   };
 }
 
@@ -86,6 +97,8 @@ export interface DiscoveryListingDetail extends DiscoveryListingItem {
     phone: string | null;
     avatarUrl: string | null;
     createdAt: Date;
+    shop?: (ListingSellerShopBadge & { tagline: string | null }) | null;
+    activeListingCount?: number;
   };
   isAvailableForDeal: boolean;
   pendingPurchaseRequestCount: number;

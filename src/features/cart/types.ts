@@ -26,6 +26,17 @@ export interface CartSummaryDTO {
   totalAmount: number;
 }
 
+/** Thông tin Shop tối giản gắn kèm user (nếu đã nâng cấp SELLER). */
+export interface SessionShopDTO {
+  id: string;
+  name: string;
+  slug: string;
+  avatarUrl?: string | null;
+  city: string;
+  bannerTheme: string;
+  isVerified: boolean;
+}
+
 /** Thông tin user an toàn dùng chung cho Navbar & Session Context. */
 export interface SessionUserDTO {
   id: string;
@@ -35,4 +46,5 @@ export interface SessionUserDTO {
   avatarUrl: string | null;
   role: string;
   status: string;
+  shop?: SessionShopDTO | null;
 }

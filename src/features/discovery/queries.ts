@@ -59,6 +59,17 @@ const LISTING_CARD_SELECT = {
       id: true,
       fullName: true,
       avatarUrl: true,
+      shop: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          avatarUrl: true,
+          city: true,
+          bannerTheme: true,
+          isVerified: true,
+        },
+      },
     },
   },
 } satisfies Prisma.ListingSelect;
@@ -82,7 +93,12 @@ function mapRowToDiscoveryItem(row: RawListingCardRow): DiscoveryListingItem {
     createdAt: row.createdAt,
     category: row.category,
     brand: row.brand,
-    seller: row.seller,
+    seller: {
+      id: row.seller.id,
+      fullName: row.seller.fullName,
+      avatarUrl: row.seller.avatarUrl,
+      shop: row.seller.shop,
+    },
   };
 }
 
@@ -352,6 +368,25 @@ export async function getListingDetailById(id: string): Promise<{
           phone: true,
           avatarUrl: true,
           createdAt: true,
+          shop: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              avatarUrl: true,
+              city: true,
+              bannerTheme: true,
+              isVerified: true,
+              tagline: true,
+            },
+          },
+          _count: {
+            select: {
+              listings: {
+                where: { status: LISTING_STATUS.ACTIVE },
+              },
+            },
+          },
         },
       },
       _count: {
@@ -410,7 +445,15 @@ export async function getListingDetailById(id: string): Promise<{
     updatedAt: row.updatedAt,
     category: row.category,
     brand: row.brand,
-    seller: row.seller,
+    seller: {
+      id: row.seller.id,
+      fullName: row.seller.fullName,
+      phone: row.seller.phone,
+      avatarUrl: row.seller.avatarUrl,
+      createdAt: row.seller.createdAt,
+      shop: row.seller.shop,
+      activeListingCount: row.seller._count.listings,
+    },
     isAvailableForDeal: isListingAvailableForDeal(status),
     pendingPurchaseRequestCount: row._count.purchaseRequests,
     pendingExchangeOfferCount: row._count.offersAsTarget,

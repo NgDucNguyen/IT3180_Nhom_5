@@ -45,6 +45,12 @@ export default async function ProfilePage() {
   if (!user) redirect("/login");
 
   const isAdmin = user.role === ROLES.ADMIN;
+  const isSeller = user.role === ROLES.SELLER;
+  const roleLabel = isAdmin
+    ? "Quản trị viên (Admin)"
+    : isSeller
+      ? "Chủ Shop (kiêm Người mua)"
+      : "Người mua (Buyer)";
 
   return (
     <main className="py-10 sm:py-12">
@@ -67,7 +73,7 @@ export default async function ProfilePage() {
               <div className="flex flex-wrap items-center gap-2">
                 <StatusBadge status={user.status} entity="user" size="md" />
                 <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-200">
-                  {isAdmin ? "Quản trị viên" : "Thành viên"}
+                  {roleLabel}
                 </span>
               </div>
             </div>
@@ -105,7 +111,7 @@ export default async function ProfilePage() {
                   Vai trò
                 </dt>
                 <dd className="mt-1 text-sm font-semibold text-slate-900">
-                  {isAdmin ? "Quản trị viên" : "Người dùng"}
+                  {roleLabel}
                 </dd>
               </div>
             </dl>
@@ -118,18 +124,28 @@ export default async function ProfilePage() {
                 >
                   Khám phá thiết bị
                 </Link>
-                <Link
-                  href="/seller/listings"
-                  className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
-                >
-                  Tin của tôi
-                </Link>
+                {!isAdmin && (
+                  <>
+                    <Link
+                      href="/buyer/requests"
+                      className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                    >
+                      Yêu cầu mua đã gửi
+                    </Link>
+                    <Link
+                      href="/transactions"
+                      className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                    >
+                      Đơn &amp; Giao dịch
+                    </Link>
+                  </>
+                )}
                 {isAdmin && (
                   <Link
                     href="/admin"
                     className="inline-flex items-center rounded-xl border border-violet-200 bg-violet-50 px-4 py-2 text-xs font-semibold text-violet-700 transition hover:bg-violet-100"
                   >
-                    Trang Admin
+                    🛡️ Trang Quản trị Admin
                   </Link>
                 )}
               </div>
@@ -137,6 +153,98 @@ export default async function ProfilePage() {
               <LogoutButton />
             </div>
           </Card>
+
+          {/* Thẻ vai trò C2C theo từng Actor */}
+          {user.role === ROLES.USER && (
+            <Card className="rounded-3xl border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-violet-50 p-6 shadow-sm sm:p-8">
+              <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <div className="space-y-1.5">
+                  <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-0.5 text-[11px] font-bold text-indigo-700">
+                    Nâng cấp Tài khoản
+                  </span>
+                  <h2 className="text-lg font-extrabold text-slate-900">
+                    Mở Shop của riêng bạn trên Elade
+                  </h2>
+                  <p className="text-sm text-slate-600">
+                    Hiện bạn đang là <strong>Người mua</strong>. Khi nâng cấp
+                    lên Chủ Shop, bạn có trang gian hàng riêng chuyên nghiệp để
+                    đăng bán &amp; trao đổi thiết bị — đồng thời vẫn giữ nguyên
+                    quyền mua hàng tại các Shop khác.
+                  </p>
+                </div>
+                <Link
+                  href="/seller/upgrade"
+                  className="inline-flex shrink-0 items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-xs font-bold text-white shadow-sm transition hover:bg-indigo-500"
+                >
+                  🚀 Đăng ký Mở Shop →
+                </Link>
+              </div>
+            </Card>
+          )}
+
+          {isSeller && user.shop && (
+            <Card className="rounded-3xl border-emerald-200 bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/60 p-6 shadow-sm sm:p-8">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="flex items-start gap-3.5">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-emerald-300 bg-emerald-600 text-lg font-extrabold text-white shadow-xs">
+                    {user.shop.avatarUrl ? (
+                      <img
+                        src={user.shop.avatarUrl}
+                        alt={user.shop.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      user.shop.name.charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-emerald-100 px-3 py-0.5 text-[11px] font-bold text-emerald-800">
+                        🏪 Gian hàng của bạn
+                      </span>
+                      {user.shop.isVerified && (
+                        <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-800">
+                          ✓ Shop Uy Tín
+                        </span>
+                      )}
+                    </div>
+                    <h2 className="text-xl font-extrabold text-slate-900">
+                      {user.shop.name}
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                      /shops/{user.shop.slug} · {user.shop.city}
+                      {user.shop.tagline ? ` · ${user.shop.tagline}` : ""}
+                    </p>
+                    <p className="pt-1 text-xs text-slate-600">
+                      Tài khoản Chủ Shop của bạn vẫn có thể bỏ giỏ hàng, gửi yêu
+                      cầu mua và giao dịch mua bình thường tại các Shop khác.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <Link
+                    href={`/shops/${user.shop.slug}`}
+                    className="inline-flex items-center rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-emerald-500"
+                  >
+                    Xem Trang Shop
+                  </Link>
+                  <Link
+                    href="/seller/listings"
+                    className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                  >
+                    Kênh Người bán
+                  </Link>
+                  <Link
+                    href="/seller/shop"
+                    className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                  >
+                    Tùy chỉnh Shop
+                  </Link>
+                </div>
+              </div>
+            </Card>
+          )}
         </div>
       </Container>
     </main>

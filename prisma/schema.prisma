@@ -26,7 +26,7 @@ datasource db {
 
 // ---------------------------------------------------------------------------
 // 1. USER
-// role   : USER | ADMIN
+// role   : USER (Người mua) | SELLER (Người bán / Chủ Shop) | ADMIN
 // status : ACTIVE | LOCKED
 // ---------------------------------------------------------------------------
 model User {
@@ -41,6 +41,7 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  shop             Shop?
   listings         Listing[]
   purchaseRequests PurchaseRequest[]
   offersProposed   ExchangeOffer[]   @relation("OfferProposer")
@@ -268,4 +269,31 @@ model CartItem {
   @@index([userId, createdAt])
   @@index([listingId])
   @@map("cart_items")
+}
+
+// ---------------------------------------------------------------------------
+// 10. SHOP  (hồ sơ Cửa hàng của Người bán — nâng cấp từ tài khoản Buyer)
+// Quan hệ 1-1 với User. Khi nâng cấp thành Shop, User.role chuyển thành SELLER.
+// Người bán vẫn đi mua hàng tại các Shop khác như người mua bình thường.
+// ---------------------------------------------------------------------------
+model Shop {
+  id           String   @id @default(cuid())
+  ownerId      String   @unique
+  name         String
+  slug         String   @unique
+  avatarUrl    String?
+  tagline      String?
+  description  String?
+  city         String   @default("Hà Nội")
+  address      String?
+  contactPhone String?
+  bannerTheme  String   @default("indigo")
+  isVerified   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([slug])
+  @@map("shops")
 }

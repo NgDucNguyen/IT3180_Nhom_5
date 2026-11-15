@@ -27,6 +27,12 @@ export interface ListingCardItem {
   seller?: {
     id?: string;
     fullName: string;
+    shop?: {
+      name: string;
+      slug: string;
+      avatarUrl?: string | null;
+      isVerified?: boolean;
+    } | null;
   } | null;
   createdAt?: Date | string;
 }
@@ -171,12 +177,38 @@ export function ListingCard({
 
           {listing.seller && (
             <div className="mt-2 flex items-center justify-between gap-2 text-[11px] text-slate-500">
-              <span className="truncate">
-                Người bán:{" "}
-                <strong className="font-medium text-slate-700">
-                  {listing.seller.fullName}
-                </strong>
-              </span>
+              {listing.seller.shop ? (
+                <Link
+                  href={`/shops/${listing.seller.shop.slug}`}
+                  className="inline-flex min-w-0 items-center gap-1.5 truncate font-semibold text-slate-700 transition hover:text-indigo-600"
+                >
+                  {listing.seller.shop.avatarUrl ? (
+                    <img
+                      src={listing.seller.shop.avatarUrl}
+                      alt={listing.seller.shop.name}
+                      className="h-4 w-4 shrink-0 rounded-full object-cover ring-1 ring-slate-200"
+                    />
+                  ) : (
+                    <span aria-hidden>🏪</span>
+                  )}
+                  <span className="truncate">{listing.seller.shop.name}</span>
+                  {listing.seller.shop.isVerified && (
+                    <span
+                      title="Shop uy tín đã xác minh"
+                      className="shrink-0 text-emerald-600"
+                    >
+                      ✓
+                    </span>
+                  )}
+                </Link>
+              ) : (
+                <span className="truncate">
+                  Người bán:{" "}
+                  <strong className="font-medium text-slate-700">
+                    {listing.seller.fullName}
+                  </strong>
+                </span>
+              )}
               <AddToCartButton
                 listingId={listing.id}
                 sellerId={listing.seller.id}

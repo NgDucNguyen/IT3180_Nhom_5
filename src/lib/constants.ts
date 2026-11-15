@@ -15,11 +15,26 @@
 /* ------------------------------ USER ------------------------------------ */
 
 export const ROLES = {
+  /** Người mua mặc định sau khi đăng ký */
   USER: "USER",
+  /** Người bán đã nâng cấp mở Shop (vẫn giữ đầy đủ quyền đi mua hàng) */
+  SELLER: "SELLER",
+  /** Quản trị viên toàn sàn */
   ADMIN: "ADMIN",
 } as const;
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 export const ROLE_VALUES = Object.values(ROLES);
+
+export const SHOP_BANNER_THEMES = {
+  INDIGO: "indigo",
+  EMERALD: "emerald",
+  AMBER: "amber",
+  ROSE: "rose",
+  SLATE: "slate",
+} as const;
+export type ShopBannerTheme =
+  (typeof SHOP_BANNER_THEMES)[keyof typeof SHOP_BANNER_THEMES];
+export const SHOP_BANNER_THEME_VALUES = Object.values(SHOP_BANNER_THEMES);
 
 export const USER_STATUS = {
   ACTIVE: "ACTIVE",

@@ -234,29 +234,75 @@ export default async function ListingDetailPage({
                 </div>
               )}
 
-              {/* THÔNG TIN NGƯỜI BÁN */}
-              <div className="mt-5 rounded-2xl border border-slate-200 p-4">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  👤 Thông tin người bán
-                </h3>
-                <div className="mt-3 flex items-center justify-between gap-3">
+              {/* THÔNG TIN SHOP / NGƯỜI BÁN (THẺ GIAN HÀNG) */}
+              <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    🏪 Thông tin Cửa hàng / Người bán
+                  </h3>
+                  {listing.seller.shop?.isVerified && (
+                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                      ✓ Shop Uy Tín
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-600 text-base font-bold text-white">
-                      {listing.seller.fullName.charAt(0).toUpperCase()}
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-600 text-base font-extrabold text-white shadow-xs">
+                      {listing.seller.shop?.avatarUrl ? (
+                        <img
+                          src={listing.seller.shop.avatarUrl}
+                          alt={listing.seller.shop.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        (listing.seller.shop?.name ?? listing.seller.fullName)
+                          .charAt(0)
+                          .toUpperCase()
+                      )}
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-slate-900">
-                        {listing.seller.fullName}
+                      <p className="text-sm font-extrabold text-slate-900">
+                        {listing.seller.shop?.name ?? listing.seller.fullName}
                       </p>
                       <p className="text-xs text-slate-500">
-                        SĐT liên hệ:{" "}
-                        <strong className="font-mono text-slate-700">
-                          {listing.seller.phone ?? "Đang cập nhật"}
+                        {listing.seller.shop ? (
+                          <>
+                            Chủ shop: {listing.seller.fullName} · 📍{" "}
+                            {listing.seller.shop.city}
+                          </>
+                        ) : (
+                          <>Người bán cá nhân</>
+                        )}
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-slate-500">
+                        Đang bán:{" "}
+                        <strong className="font-semibold text-indigo-600">
+                          {listing.seller.activeListingCount ?? 1} sản phẩm
                         </strong>
+                        {listing.seller.phone && (
+                          <>
+                            {" · "}SĐT:{" "}
+                            <strong className="font-mono text-slate-700">
+                              {listing.seller.phone}
+                            </strong>
+                          </>
+                        )}
                       </p>
                     </div>
                   </div>
-                  <StatusBadge status="ACTIVE" entity="user" />
+
+                  {listing.seller.shop ? (
+                    <Link
+                      href={`/shops/${listing.seller.shop.slug}`}
+                      className="inline-flex items-center gap-1 rounded-xl border border-indigo-200 bg-white px-3.5 py-2 text-xs font-bold text-indigo-700 shadow-2xs transition hover:bg-indigo-50"
+                    >
+                      🏪 Xem Shop →
+                    </Link>
+                  ) : (
+                    <StatusBadge status="ACTIVE" entity="user" />
+                  )}
                 </div>
               </div>
 

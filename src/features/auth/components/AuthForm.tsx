@@ -9,10 +9,10 @@ import { notifyAuthChanged } from "@/features/cart";
 import { isValidPhoneNumber } from "@/features/auth/phone";
 
 const DEMO_ACCOUNTS = [
-  { email: "admin@nhom5.vn", roleLabel: "Quản trị viên" },
-  { email: "an@nhom5.vn", roleLabel: "Người dùng" },
-  { email: "binh@nhom5.vn", roleLabel: "Người dùng" },
-  { email: "chi@nhom5.vn", roleLabel: "Người dùng" },
+  { email: "admin@nhom5.vn", roleLabel: "Quản trị viên (Admin)" },
+  { email: "mua@nhom5.vn", roleLabel: "Người mua (Chưa mở Shop)" },
+  { email: "an@nhom5.vn", roleLabel: "Chủ Shop · An Tech Store" },
+  { email: "binh@nhom5.vn", roleLabel: "Chủ Shop · Bình Mobile" },
 ] as const;
 
 export function AuthForm({ mode }: { mode: "login" | "register" }) {

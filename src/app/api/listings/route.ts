@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { requireUser } from "@/lib/auth";
+import { requireSeller, requireUser } from "@/lib/auth";
 import { assertSameOrigin } from "@/features/auth/validation";
 import { ListingError, listingErrorResponse, listingResponse } from "@/features/listing/errors";
 import { createListing, getSellerListings } from "@/features/listing/service";
@@ -8,7 +8,7 @@ import { readListingBody, validateListingInput } from "@/features/listing/valida
 export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
-    const user = await requireUser(request);
+    const user = await requireSeller(request);
     const input = validateListingInput(await readListingBody(request));
     return listingResponse(await createListing(user.id, input), 201);
   } catch (error) {

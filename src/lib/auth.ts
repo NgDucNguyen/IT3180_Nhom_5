@@ -13,6 +13,13 @@ const AUDIENCE = "electroswap-web";
 export const PUBLIC_USER_SELECT = {
   id: true, email: true, fullName: true, phone: true, avatarUrl: true,
   role: true, status: true, createdAt: true, updatedAt: true,
+  shop: {
+    select: {
+      id: true, name: true, slug: true, avatarUrl: true, tagline: true, description: true,
+      city: true, address: true, contactPhone: true, bannerTheme: true,
+      isVerified: true, createdAt: true, updatedAt: true,
+    },
+  },
 } as const;
 
 function secret(): string {
@@ -104,6 +111,18 @@ export async function getCurrentUser(request?: NextRequest) {
 export async function requireUser(request?: NextRequest) {
   const user = await getCurrentUser(request);
   if (!user) throw new AuthError("UNAUTHENTICATED", "Vui lòng đăng nhập.", 401);
+  return user;
+}
+
+export async function requireSeller(request?: NextRequest) {
+  const user = await requireUser(request);
+  if (user.role !== ROLES.SELLER) {
+    throw new AuthError(
+      "FORBIDDEN",
+      "Vui lòng nâng cấp tài khoản thành Shop (Người bán) để đăng bán thiết bị.",
+      403,
+    );
+  }
   return user;
 }
 
