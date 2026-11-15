@@ -119,6 +119,17 @@ export function canTransitionPurchaseRequest(
   return PURCHASE_REQUEST_TRANSITIONS[from]?.includes(to) ?? false;
 }
 
+export function assertPurchaseRequestTransition(
+  from: PurchaseRequestStatus,
+  to: PurchaseRequestStatus,
+): void {
+  if (!canTransitionPurchaseRequest(from, to)) {
+    throw new Error(
+      `Chuyển trạng thái PurchaseRequest không hợp lệ: ${from} -> ${to}`,
+    );
+  }
+}
+
 /* ===========================================================================
  * EXCHANGE OFFER
  * ===========================================================================
@@ -148,6 +159,17 @@ export function canTransitionExchangeOffer(
   return EXCHANGE_OFFER_TRANSITIONS[from]?.includes(to) ?? false;
 }
 
+export function assertExchangeOfferTransition(
+  from: ExchangeOfferStatus,
+  to: ExchangeOfferStatus,
+): void {
+  if (!canTransitionExchangeOffer(from, to)) {
+    throw new Error(
+      `Chuyển trạng thái ExchangeOffer không hợp lệ: ${from} -> ${to}`,
+    );
+  }
+}
+
 /* ===========================================================================
  * TRANSACTION
  * ===========================================================================
@@ -171,6 +193,17 @@ export function canTransitionTransaction(
   to: TransactionStatus,
 ): boolean {
   return TRANSACTION_TRANSITIONS[from]?.includes(to) ?? false;
+}
+
+export function assertTransactionTransition(
+  from: TransactionStatus,
+  to: TransactionStatus,
+): void {
+  if (!canTransitionTransaction(from, to)) {
+    throw new Error(
+      `Chuyển trạng thái Transaction không hợp lệ: ${from} -> ${to}`,
+    );
+  }
 }
 
 /** Giao dịch đã đủ điều kiện hoàn tất chưa? */

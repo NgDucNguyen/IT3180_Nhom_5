@@ -123,14 +123,42 @@ export const REPORT_STATUS_VALUES = Object.values(REPORT_STATUS);
 
 /* ---------------------------- TYPE GUARDS -------------------------------- */
 
-export function isListingStatus(value: string): value is ListingStatus {
-  return (LISTING_STATUS_VALUES as string[]).includes(value);
-}
-
 export function isRole(value: string): value is Role {
   return (ROLE_VALUES as string[]).includes(value);
 }
 
+export function isUserStatus(value: string): value is UserStatus {
+  return (USER_STATUS_VALUES as string[]).includes(value);
+}
+
+export function isListingStatus(value: string): value is ListingStatus {
+  return (LISTING_STATUS_VALUES as string[]).includes(value);
+}
+
 export function isCondition(value: string): value is Condition {
   return (CONDITION_VALUES as string[]).includes(value);
+}
+
+export function isPurchaseRequestStatus(
+  value: string,
+): value is PurchaseRequestStatus {
+  return (PURCHASE_REQUEST_STATUS_VALUES as string[]).includes(value);
+}
+
+export function isExchangeOfferStatus(
+  value: string,
+): value is ExchangeOfferStatus {
+  return (EXCHANGE_OFFER_STATUS_VALUES as string[]).includes(value);
+}
+
+export function isTransactionType(value: string): value is TransactionType {
+  return (TRANSACTION_TYPE_VALUES as string[]).includes(value);
+}
+
+export function isTransactionStatus(value: string): value is TransactionStatus {
+  return (TRANSACTION_STATUS_VALUES as string[]).includes(value);
+}
+
+export function isReportStatus(value: string): value is ReportStatus {
+  return (REPORT_STATUS_VALUES as string[]).includes(value);
 }

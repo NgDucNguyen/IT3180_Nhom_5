@@ -213,7 +213,9 @@ stateDiagram-v2
     PENDING --> REJECTED: Admin từ chối
     REJECTED --> PENDING: Người bán sửa & gửi lại
     ACTIVE --> HIDDEN: Người bán ẩn
+    ACTIVE --> REJECTED: Admin gỡ tin vi phạm
     HIDDEN --> ACTIVE: Người bán bỏ ẩn
+    HIDDEN --> REJECTED: Admin gỡ tin vi phạm
     ACTIVE --> IN_TRANSACTION: Chấp nhận mua / trao đổi
     IN_TRANSACTION --> ACTIVE: Hủy giao dịch
     IN_TRANSACTION --> SOLD: Hoàn tất mua

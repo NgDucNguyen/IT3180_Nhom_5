@@ -1,11 +1,11 @@
+import { getCatalogBrands } from "@/features/catalog";
 import { fail, handleApiError, ok } from "@/lib/api-response";
-import { prisma } from "@/lib/prisma";
 
 /**
  * GET /api/brands
  * Lấy danh sách thương hiệu (công khai, không cần đăng nhập).
  *
- * Response 200: { "data": [{ id, name, slug, logoUrl }] }
+ * Response 200: { "data": [{ id, name, slug, logoUrl, listingCount }] }
  * Response 500: { "error": { code, message } }
  *
  * Sở hữu: TV2
@@ -14,23 +14,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const brands = await prisma.brand.findMany({
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        logoUrl: true,
-        _count: { select: { listings: true } },
-      },
-    });
-
-    const data = brands
-      .map(({ _count, ...brand }) => ({
-        ...brand,
-        listingCount: _count.listings,
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name, "vi"));
-
+    const data = await getCatalogBrands();
     return ok(data);
   } catch (error) {
     return handleApiError(error);
