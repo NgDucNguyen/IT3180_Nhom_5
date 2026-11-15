@@ -1,11 +1,11 @@
-# Chợ Thiết Bị Điện Tử — Electronics Trading & Exchange Marketplace
+# ELADE — Electronics Trading & Exchange Marketplace
 
 > **IT3180 — Nhóm 5** · Nền tảng C2C mua bán & trao đổi thiết bị điện tử
 > Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · Prisma 6 · **SQLite**
 
 ---
 
-## ⚡ CHẠY DỰ ÁN TRONG 4 BƯỚC (dành cho 7 thành viên còn lại)
+## ⚡ CHẠY DỰ ÁN TRONG 4 BƯỚC
 
 ```bash
 # 1. Cài dependencies
@@ -142,7 +142,7 @@ git push origin feat/tv3-listing-create
 
 1. Đọc **[`AGENTS.md`](./AGENTS.md)** — luật phân vùng file cho 8 người.
 2. Đọc **[`docs/diagrams/erd.md`](./docs/diagrams/erd.md)** — hiểu schema.
-3. Đọc **[`GUIDE.md`](./GUIDE.md)** — phân công vai trò.
+3. Đọc **[`General_GUIDE.md`](./General_GUIDE.md)** và **[`MEMEBER-GUIDEBOOK.md`](./MEMBER-GUIDEBOOK.md)** — phân công vai trò.
 4. Chỉ sửa file trong vùng của mình. Cần đổi schema → báo **TV2**.
 
 ---
